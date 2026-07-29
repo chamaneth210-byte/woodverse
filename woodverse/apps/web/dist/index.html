@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WoodVerse</title>
+    <script>
+      (() => {
+        let theme = null;
+        try {
+          theme = localStorage.getItem("woodverse-theme");
+        } catch {}
+        if (theme === "dark") document.documentElement.classList.add("dark");
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-fdw5g0hQ.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BIhm3znd.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+*
+!woodverse
+!woodverse/apps
+!woodverse/apps/web
+!woodverse/apps/web/**
+woodverse/apps/web/node_modules
+woodverse/apps/web/dist
+woodverse/apps/web/.env.local
+woodverse/apps/web/.vercel

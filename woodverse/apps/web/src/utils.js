@@ -15,3 +15,13 @@ export function navigate(path) {
   window.dispatchEvent(new PopStateEvent("popstate"));
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
+export async function apiRequest(path, options = {}) {
+  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
+  const response = await fetch(`${baseUrl}${path}`, {
+    ...options,
+    headers: { "content-type": "application/json", ...(options.headers || {}) },
+  });
+  if (!response.ok) throw new Error(`API request failed: ${response.status}`);
+  return response.json();
+}

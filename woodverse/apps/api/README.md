@@ -1,56 +1,74 @@
-# Readme
+# WoodVerse API
 
-## Document Information
+Node.js API for WoodVerse commerce, operations, AI proxying, and realtime events.
 
-- Project: WoodVerse
-- Status: Draft
-- Version: 1.0
-- Last Updated: To be updated
-- Owner: WoodVerse Development Team
+## Stack
 
-## Project Context
-
-WoodVerse is an AI-assisted multi-vendor web platform for furniture,
-wooden products, wooden gifts, standard laser-cut files, indoor plants,
-custom furniture, supplier management, inventory, production tracking,
-payments, shipments, support, and administration.
-
-Main roles:
-
-- Customer
-- Vendor / Seller
-- Supplier
-- Support Staff
-- System Administrator
-
-Technology stack:
-
-- React.js
-- Tailwind CSS
 - Node.js
 - Express.js
-- PostgreSQL
-- Python
-- FastAPI
-- Scikit-learn
-- OpenCV
-- MiDaS / DPT
 - Socket.IO
+- PostgreSQL via `pg`
 
+## Local Setup
 
-## Purpose
+```bash
+cd apps/api
+npm install
+npm run dev
+```
 
-This folder contains the `apps/api` application area for WoodVerse.
+The API listens on `http://localhost:4000`.
 
-## Expected Contents
+## Environment
 
-- Source code
-- Configuration
-- Tests
-- README notes
-- Environment examples where required
+- `PORT`: API port. Default: `4000`.
+- `WEB_ORIGIN`: Comma-separated frontend origins. Default: `http://localhost:5173,http://localhost:5174`.
+- `AI_SERVICE_URL`: FastAPI AI service URL. Default: `http://localhost:8000`.
+- `DATABASE_URL`: PostgreSQL connection string, for example `postgresql://woodverse:woodverse@localhost:5432/woodverse`.
+- `DB_SSL`: Set to `true` for managed PostgreSQL providers that require SSL.
+- `DB_POOL_SIZE`: PostgreSQL connection pool size. Default: `10`.
 
-## Setup Notes
+## PostgreSQL Setup
 
-Document installation, local development commands, test commands, and build
-commands when implementation starts.
+Create the database and run the schema:
+
+```bash
+createdb woodverse
+psql "$DATABASE_URL" -f src/db/schema.sql
+```
+
+When `DATABASE_URL` is set, the API also initializes the schema automatically at startup. Without it, the API keeps using its in-memory demo data so the frontend can still run.
+
+## HTTP Endpoints
+
+- `GET /health`
+- `GET /api/health`
+- `GET /api/catalog`
+- `GET /api/orders`
+- `POST /api/orders`
+- `POST /api/orders/evaluate-stock`
+- `GET /api/db/health`
+- `GET /api/users`, `POST /api/users`
+- `GET /api/vendors`, `POST /api/vendors`
+- `GET /api/products`, `POST /api/products`
+- `GET /api/quotations`, `POST /api/quotations`
+- `GET /api/messages`, `POST /api/messages`
+- `POST /api/ai/chat`
+- `POST /api/ai/stock-decision`
+- `POST /api/notifications`
+
+## Socket.IO Events
+
+- `vendor:join`
+- `vendor:thread:open`
+- `vendor:message`
+- `vendor:message:send`
+- `notification:join`
+- `notification:event`
+- `notification:send`
+
+## Practical Flow
+
+Customer order items are evaluated by stock. In-stock items are reserved for delivery. Out-of-stock or over-quantity items are marked as manufacture required, vendor approval required, and production tracking required.
+
+AI requests are proxied to the FastAPI service. If that service is offline, the Express API returns deterministic fallback answers so the React UI keeps working.

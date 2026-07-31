@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: woodverse-api
+    runtime: node
+    rootDir: woodverse/apps/api
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: WEB_ORIGIN
+        sync: false
+      - key: AI_SERVICE_URL
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: DB_SSL
+        value: "true"
+
+  - type: web
+    name: woodverse-ai
+    runtime: python
+    rootDir: woodverse/apps/ai-service
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn src.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health

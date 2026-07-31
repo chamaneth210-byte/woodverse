@@ -1,56 +1,30 @@
-# Readme
+# WoodVerse AI Service
 
-## Document Information
+FastAPI service for WoodVerse AI assistance and operational decisions.
 
-- Project: WoodVerse
-- Status: Draft
-- Version: 1.0
-- Last Updated: To be updated
-- Owner: WoodVerse Development Team
+## Stack
 
-## Project Context
+- FastAPI for HTTP APIs
+- Scikit-learn for lightweight intent classification
+- Uvicorn for local development
 
-WoodVerse is an AI-assisted multi-vendor web platform for furniture,
-wooden products, wooden gifts, standard laser-cut files, indoor plants,
-custom furniture, supplier management, inventory, production tracking,
-payments, shipments, support, and administration.
+## Local Setup
 
-Main roles:
+```bash
+cd apps/ai-service
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+```
 
-- Customer
-- Vendor / Seller
-- Supplier
-- Support Staff
-- System Administrator
+## Endpoints
 
-Technology stack:
+- `GET /health`
+- `POST /ai/chat`
+- `POST /ai/stock-decision`
+- `POST /ai/quote-estimate`
 
-- React.js
-- Tailwind CSS
-- Node.js
-- Express.js
-- PostgreSQL
-- Python
-- FastAPI
-- Scikit-learn
-- OpenCV
-- MiDaS / DPT
-- Socket.IO
+## Role In The App
 
-
-## Purpose
-
-This folder contains the `apps/ai-service` application area for WoodVerse.
-
-## Expected Contents
-
-- Source code
-- Configuration
-- Tests
-- README notes
-- Environment examples where required
-
-## Setup Notes
-
-Document installation, local development commands, test commands, and build
-commands when implementation starts.
+The Node/Express API calls this service through `AI_SERVICE_URL` and falls back to deterministic API responses if the AI service is offline. This lets React pages continue working during frontend-only development.

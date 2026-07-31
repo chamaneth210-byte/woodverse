@@ -1,6 +1,6 @@
 import { Bell, Heart, ShoppingCart } from "lucide-react";
 import { CroppedImage } from "./CroppedImage";
-import { formatPrice } from "../utils";
+import { formatPrice, navigate } from "../utils";
 
 const generated = {
   desk: "from-[#c8945b] via-[#8d5932] to-[#d8e1de]",
@@ -37,17 +37,30 @@ export function ProductCard({ product, onAdd }) {
   return (
     <article className="grid h-full grid-rows-[auto_1fr] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-[#202624]">
       <div className="relative h-48 overflow-hidden bg-slate-200 dark:bg-slate-800 sm:h-52 lg:h-56">
-        <ProductMedia product={product} />
-        <button className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-white text-wood shadow" aria-label={`Save ${product.name}`}>
+        <button onClick={() => navigate(`/products/${product.id}`)} className="block h-full w-full text-left" aria-label={`View details for ${product.name}`}>
+          <ProductMedia product={product} />
+        </button>
+        <button
+          onClick={() => window.alert(`${product.name} saved to your wishlist.`)}
+          className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-white text-wood shadow"
+          aria-label={`Save ${product.name}`}
+        >
           <Heart className="h-4 w-4" />
         </button>
         <span className={`absolute bottom-3 left-3 rounded-sm px-2 py-1 text-[11px] font-extrabold uppercase text-white ${stockClass}`}>
           {product.stock}
         </span>
       </div>
-      <div className="flex min-h-48 flex-col p-5 sm:min-h-52 sm:p-6">
-        <h3 className="break-words text-[17px] font-semibold leading-snug text-slate-600 dark:text-stone-100">{product.name}</h3>
+      <div className="flex min-h-64 flex-col p-5 sm:min-h-72 sm:p-6">
+        <button onClick={() => navigate(`/products/${product.id}`)} className="text-left">
+          <h3 className="break-words text-[17px] font-semibold leading-snug text-slate-600 transition hover:text-forest dark:text-stone-100 dark:hover:text-emerald-200">{product.name}</h3>
+        </button>
         <p className="mt-1 break-words text-sm uppercase leading-snug text-slate-500 dark:text-stone-400">Vendor: {product.vendor}</p>
+        {product.description && (
+          <p className="mt-3 line-clamp-3 break-words text-sm leading-relaxed text-slate-600 dark:text-stone-300">
+            {product.description}
+          </p>
+        )}
         <div className="mt-3 flex min-h-7 flex-wrap gap-1.5">
           {product.tags.map((tag) => (
             <span key={tag} className="rounded border border-blue-200 bg-blue-50 px-2 py-0.5 text-[10px] text-slate-600 dark:border-slate-600 dark:bg-slate-800 dark:text-stone-300">
@@ -58,7 +71,13 @@ export function ProductCard({ product, onAdd }) {
         <div className="mt-auto flex items-center justify-between gap-3 pt-6">
           <strong className="min-w-0 break-words text-[17px] leading-tight text-forest dark:text-emerald-200">{formatPrice(product.price)}</strong>
           <button
-            onClick={() => onAdd?.(product)}
+            onClick={() => {
+              if (product.stockType === "out") {
+                window.alert(`You will be notified when ${product.name} is available.`);
+                return;
+              }
+              onAdd?.(product);
+            }}
             className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg text-white ${product.stockType === "out" ? "bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-stone-300" : "bg-forest"}`}
             aria-label={product.stockType === "out" ? `Notify me when ${product.name} is available` : `Add ${product.name} to cart`}
           >

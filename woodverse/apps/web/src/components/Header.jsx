@@ -1,4 +1,5 @@
 import { Heart, Moon, Search, ShoppingCart, Sun, UserRound } from "lucide-react";
+import { BrandLogo } from "./BrandLogo";
 import { navigate } from "../utils";
 
 const links = [
@@ -11,8 +12,8 @@ const links = [
 export function Header({ path, theme, onToggleTheme, cartCount, isLoggedIn }) {
   return (
     <header className="sticky top-0 z-30 grid min-h-14 grid-cols-[auto_minmax(0,1fr)_minmax(180px,420px)_auto] items-center gap-5 border-b border-black/5 bg-paper/90 px-4 backdrop-blur dark:border-white/10 dark:bg-[#191d1c]/95 sm:px-6 lg:gap-7 lg:px-10 xl:px-12 max-lg:grid-cols-[minmax(0,1fr)_auto] max-lg:gap-x-5">
-      <button onClick={() => navigate("/")} className="min-w-0 text-left text-[17px] font-extrabold leading-tight text-forest dark:text-emerald-200">
-        WoodVerse
+      <button onClick={() => navigate("/")} className="min-w-0 text-left text-forest dark:text-emerald-200">
+        <BrandLogo imageClassName="h-8 w-8" textClassName="text-[17px] text-forest dark:text-emerald-200" />
       </button>
 
       <nav className="flex items-center justify-center gap-7 justify-self-center whitespace-nowrap text-[15px] text-slate-600 dark:text-stone-300 max-lg:order-3 max-lg:col-span-2 max-lg:w-full max-lg:justify-start max-lg:overflow-x-auto max-sm:gap-5">
@@ -36,7 +37,7 @@ export function Header({ path, theme, onToggleTheme, cartCount, isLoggedIn }) {
       </label>
 
       <div className="flex items-center gap-4 max-sm:gap-2">
-        <button className="text-slate-600 dark:text-stone-300" aria-label="Wishlist">
+        <button onClick={() => navigate(isLoggedIn ? "/profile" : "/login")} className="text-slate-600 dark:text-stone-300" aria-label="Wishlist">
           <Heart className="h-5 w-5" />
         </button>
         <button onClick={() => navigate("/cart")} className="relative text-slate-600 dark:text-stone-300" aria-label="Cart">

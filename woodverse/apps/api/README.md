@@ -37,6 +37,12 @@ createdb woodverse
 psql "$DATABASE_URL" -f src/db/schema.sql
 ```
 
+Load the demo database records. This resets the demo tables and inserts 20 rows into each table in `src/db/schema.sql`.
+
+```bash
+psql "$DATABASE_URL" -f src/db/seed.sql
+```
+
 When `DATABASE_URL` is set, the API also initializes the schema automatically at startup. Without it, the API keeps using its in-memory demo data so the frontend can still run.
 
 ## HTTP Endpoints

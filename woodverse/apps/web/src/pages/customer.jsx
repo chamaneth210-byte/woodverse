@@ -65,7 +65,7 @@ import { BrandLogo } from "../components/BrandLogo";
 import { CroppedImage } from "../components/CroppedImage";
 import { Footer, SectionHeading } from "../components/LayoutParts";
 import { ProductCard, ProductMedia } from "../components/ProductCard";
-import { categories, crop, products, vendors } from "../data/catalog";
+import { categories, crop, vendors } from "../data/catalog";
 import { apiRequest, formatPrice, navigate, sortProducts } from "../utils";
 
 function publishAdminEvent(source, title, message, priority = "Normal") {
@@ -182,7 +182,7 @@ function ProductSection({ id, title, subtitle, items, addToCart, columns = "grid
   );
 }
 
-function ProductDetailsPage({ product, addToCart }) {
+function ProductDetailsPage({ product, catalogItems = [], addToCart }) {
   if (!product) {
     return (
       <>
@@ -204,7 +204,7 @@ function ProductDetailsPage({ product, addToCart }) {
     ["Room / Use", product.room],
     ["Availability", product.stock],
   ];
-  const recommendations = products.filter((item) => item.id !== product.id && item.category === product.category).slice(0, 3);
+  const recommendations = catalogItems.filter((item) => item.id !== product.id && item.category === product.category).slice(0, 3);
 
   return (
     <>
@@ -318,10 +318,10 @@ function CatalogPage({ title, subtitle, items, addToCart }) {
   );
 }
 
-function CategoryPage({ type, addToCart }) {
+function CategoryPage({ type, items: catalogItems = [], addToCart }) {
   const gift = type === "gift";
   const [sort, setSort] = useState("featured");
-  const items = products.filter((item) => item.category === type);
+  const items = catalogItems.filter((item) => item.category === type);
   const sorted = useMemo(() => sortProducts(items, sort), [items, sort]);
   const title = gift ? "Handcrafted Wooden Gifts for Every Occasion" : "Furniture for Dining, Rest, Living, and Work";
   const subtitle = gift
@@ -512,7 +512,7 @@ function DeliveryPage() {
   );
 }
 
-function PaymentPage({ cart = [], setCart }) {
+function PaymentPage({ cart = [], setCart, catalogItems = [] }) {
   const [notice, setNotice] = useState("");
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0) || 357500;
   const delivery = subtotal ? 7500 : 0;
@@ -520,7 +520,7 @@ function PaymentPage({ cart = [], setCart }) {
   const total = subtotal + delivery + assurance;
 
   const placeOrder = async () => {
-    const orderItems = cart.length ? cart : products.slice(0, 2).map((item) => ({ ...item, quantity: 1 }));
+    const orderItems = cart.length ? cart : catalogItems.slice(0, 2).map((item) => ({ ...item, quantity: 1 }));
     const primaryProduct = orderItems.length === 1 ? orderItems[0].name : `${orderItems[0].name} + ${orderItems.length - 1} more`;
     const profile = getStoredCustomerProfile();
     let backendOrder = null;

@@ -46,11 +46,73 @@ payments, shipments, AI assistance, support, and administration.
 
 ## Repository Structure
 
-- `apps/web`: React frontend.
-- `apps/api`: Node.js and Express API.
-- `apps/ai-service`: Python FastAPI service.
-- `database`: PostgreSQL schema and migrations.
-- `docs`: Product, architecture, API, security, testing, and deployment docs.
+```
+woodverse/
+├── package.json          # Root monorepo config (npm workspaces)
+├── frontend/             # React frontend (Vite + Tailwind)
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── customer/   # Customer-facing pages
+│   │   │   ├── vendor/     # Vendor portal pages
+│   │   │   ├── admin/      # Admin console pages
+│   │   │   └── supplier/   # Supplier portal pages
+│   │   ├── components/     # Shared UI components
+│   │   ├── data/           # Frontend mock data
+│   │   └── utils.js        # Client-side helpers
+│   └── package.json
+├── backend/              # Backend services
+│   ├── api/              # Node.js/Express backend
+│   │   ├── src/
+│   │   │   ├── routes/    # Modular route handlers
+│   │   │   ├── utils/     # Shared server utilities
+│   │   │   ├── data/      # In-memory fallback data
+│   │   │   ├── socket.js  # Socket.IO handlers
+│   │   │   ├── db.js      # PostgreSQL connection
+│   │   │   └── server.js  # Entry point
+│   │   └── package.json
+│   └── ai-service/       # Python FastAPI AI service
+│       ├── src/
+│       │   └── main.py
+│       └── requirements.txt
+├── database/             # PostgreSQL schema and migrations
+│   ├── schema.sql
+│   ├── seed.sql
+│   └── README.md
+└── docs/                 # Product, architecture, API, security, testing, and deployment docs
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 18
+- PostgreSQL >= 14
+- Python >= 3.10 (for AI service)
+
+### Install
+
+```bash
+cd woodverse
+npm run install:all
+```
+
+### Development
+
+```bash
+# Run all services
+npm run dev
+
+# Or run individually
+npm run dev:web    # Frontend at http://localhost:5173
+npm run dev:api    # Backend at http://localhost:4000
+npm run dev:ai     # AI service at http://localhost:8000
+```
+
+### Build
+
+```bash
+npm run build
+```
 
 ## Documentation
 
@@ -59,4 +121,3 @@ Start with:
 - `docs/FULL_SYSTEM_DOCUMENTATION.md`
 - `docs/architecture/SYSTEM_ARCHITECTURE.md`
 - `docs/phases/IMPLEMENTATION_ROADMAP.md`
-- `MD_FILE_INDEX.md`

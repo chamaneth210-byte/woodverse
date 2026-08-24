@@ -1,0 +1,27 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "services": [
+    {
+      "name": "woodverse-api",
+      "rootDir": "woodverse/backend/api",
+      "build": {
+        "builder": "NIXPACKS"
+      },
+      "deploy": {
+        "startCommand": "npm start",
+        "healthcheckPath": "/api/health"
+      }
+    },
+    {
+      "name": "woodverse-ai",
+      "rootDir": "woodverse/backend/ai-service",
+      "build": {
+        "builder": "NIXPACKS"
+      },
+      "deploy": {
+        "startCommand": "uvicorn src.main:app --host 0.0.0.0 --port $PORT",
+        "healthcheckPath": "/health"
+      }
+    }
+  ]
+}

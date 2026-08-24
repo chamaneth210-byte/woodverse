@@ -2,13 +2,13 @@
 
 ## Vercel frontend
 
-Create a Vercel project from this repository and set its Root Directory to `woodverse/apps/web`.
+Create a Vercel project from this repository and set its Root Directory to `woodverse/frontend`.
 
 - Build command: `npm run build`
 - Output directory: `dist`
 - Environment variable: `VITE_API_URL=https://woodverse-api.onrender.com`
 
-`apps/web/vercel.json` keeps React routes working after a page refresh.
+`frontend/vercel.json` keeps React routes working after a page refresh.
 
 ## Render services
 
@@ -21,9 +21,9 @@ DATABASE_URL=your-postgresql-connection-string
 DB_SSL=true
 ```
 
-The API service runs from `woodverse/apps/api` with `npm ci` and `npm start`.
+The API service runs from `woodverse/backend/api` with `npm ci` and `npm start`.
 
-The AI service runs from `woodverse/apps/ai-service` with `pip install -r requirements.txt` and `uvicorn src.main:app --host 0.0.0.0 --port $PORT`.
+The AI service runs from `woodverse/backend/ai-service` with `pip install -r requirements.txt` and `uvicorn src.main:app --host 0.0.0.0 --port $PORT`.
 
 ## Supabase Storage
 

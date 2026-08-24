@@ -1,56 +1,34 @@
-# Readme
+# Database
 
-## Document Information
+PostgreSQL schema and seed data for WoodVerse.
 
-- Project: WoodVerse
-- Status: Draft
-- Version: 1.0
-- Last Updated: To be updated
-- Owner: WoodVerse Development Team
+## Contents
 
-## Project Context
+- `schema.sql` - Database schema with tables, indexes, and constraints
+- `seed.sql` - Seed data for development
 
-WoodVerse is an AI-assisted multi-vendor web platform for furniture,
-wooden products, wooden gifts, standard laser-cut files, indoor plants,
-custom furniture, supplier management, inventory, production tracking,
-payments, shipments, support, and administration.
+## Setup
 
-Main roles:
+1. Create a PostgreSQL database:
+    ```bash
+    createdb woodverse
+    ```
 
-- Customer
-- Vendor / Seller
-- Supplier
-- Support Staff
-- System Administrator
+2. Apply the schema:
+    ```bash
+    psql -d woodverse -f database/schema.sql
+    ```
 
-Technology stack:
+3. Apply seed data (optional):
+    ```bash
+    psql -d woodverse -f database/seed.sql
+    ```
 
-- React.js
-- Tailwind CSS
-- Node.js
-- Express.js
-- PostgreSQL
-- Python
-- FastAPI
-- Scikit-learn
-- OpenCV
-- MiDaS / DPT
-- Socket.IO
+## Connection
 
+Set the `DATABASE_URL` environment variable:
+```
+DATABASE_URL=postgresql://woodverse:woodverse@localhost:5432/woodverse
+```
 
-## Purpose
-
-This folder contains the `database` application area for WoodVerse.
-
-## Expected Contents
-
-- Source code
-- Configuration
-- Tests
-- README notes
-- Environment examples where required
-
-## Setup Notes
-
-Document installation, local development commands, test commands, and build
-commands when implementation starts.
+The API service (`backend/api`) connects to this database on startup.

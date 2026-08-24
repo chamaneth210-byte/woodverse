@@ -1,0 +1,24 @@
+{
+  "name": "woodverse",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WoodVerse - AI-assisted multi-vendor woodcraft platform",
+  "workspaces": [
+    "frontend",
+    "backend/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\" \"npm run dev:ai\"",
+    "dev:api": "npm run dev --workspace=backend/api",
+    "dev:web": "npm run dev --workspace=frontend",
+    "dev:ai": "cd backend/ai-service && uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload",
+    "build": "npm run build --workspace=frontend",
+    "start": "npm run start --workspace=backend/api",
+    "install:all": "npm install",
+    "lint": "npm run lint --workspace=frontend && npm run lint --workspace=backend/api",
+    "typecheck": "npm run typecheck --workspace=frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -5,7 +5,8 @@
       "name": "woodverse-api",
       "rootDir": "woodverse/backend/api",
       "build": {
-        "builder": "NIXPACKS"
+        "builder": "NIXPACKS",
+        "buildCommand": "npm install && npm run build"
       },
       "deploy": {
         "startCommand": "npm start",
@@ -16,7 +17,8 @@
       "name": "woodverse-ai",
       "rootDir": "woodverse/backend/ai-service",
       "build": {
-        "builder": "NIXPACKS"
+        "builder": "NIXPACKS",
+        "buildCommand": "pip install -r requirements.txt"
       },
       "deploy": {
         "startCommand": "uvicorn src.main:app --host 0.0.0.0 --port $PORT",

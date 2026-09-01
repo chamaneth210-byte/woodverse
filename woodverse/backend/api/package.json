@@ -7,7 +7,7 @@
     "dev": "node src/server.js",
     "start": "node src/server.js",
     "build": "echo \"No build step required for API\"",
-    "postinstall": "cp ../../database/schema.sql ./schema.sql 2>/dev/null || true"
+    "postinstall": "node -e \"const fs=require('fs');const src='../../database/schema.sql';const dst='src/schema.sql';if(fs.existsSync(src)&&!fs.existsSync(dst)){fs.copyFileSync(src,dst);console.log('schema.sql copied to src/');}\""
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

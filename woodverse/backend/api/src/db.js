@@ -15,7 +15,7 @@ export async function query(text, values = []) {
 
 export async function initializeDatabase() {
   if (!pool) return { configured: false, initialized: false };
-  const schema = await readFile(new URL("../../schema.sql", import.meta.url), "utf8");
+  const schema = await readFile(new URL("./schema.sql", import.meta.url), "utf8");
   await pool.query(schema);
   return { configured: true, initialized: true };
 }

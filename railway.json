@@ -6,7 +6,7 @@
       "rootDir": "woodverse/backend/api",
       "build": {
         "builder": "NIXPACKS",
-        "buildCommand": "npm install"
+        "buildCommand": "cp ../../database/schema.sql src/schema.sql && npm install"
       },
       "deploy": {
         "startCommand": "npm start",

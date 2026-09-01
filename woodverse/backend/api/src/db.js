@@ -5,8 +5,8 @@ const databaseUrl = process.env.DATABASE_URL;
 
 export const databaseConfigured = Boolean(databaseUrl);
 export const pool = databaseConfigured
-  ? new Pool({ connectionString: databaseUrl, max: Number(process.env.DB_POOL_SIZE || 10), ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: true } : undefined })
-  : null;
+    ? new Pool({ connectionString: databaseUrl, max: Number(process.env.DB_POOL_SIZE || 10), ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: true } : undefined, family: 4 })
+    : null;
 
 export async function query(text, values = []) {
   if (!pool) throw new Error("DATABASE_URL is not configured");

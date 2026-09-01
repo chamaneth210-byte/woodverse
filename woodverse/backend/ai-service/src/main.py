@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import base64
 import os
 import re
+from io import BytesIO
 from typing import Any
 
+import cv2
+import numpy as np
 from fastapi import FastAPI, Depends, HTTPException, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security.api_key import APIKeyHeader
@@ -423,4 +427,294 @@ def customization_recommendations(request: CustomizationRecommendationRequest) -
         paintRecommendations=top_paints,
         confidence=confidence,
         reasoning=reasoning,
+    )
+
+
+class ImageBase64Request(BaseModel):
+    imageBase64: str = Field(..., description="Base64-encoded image (with or without data: URL prefix)")
+    filename: str | None = None
+    contentType: str | None = None
+
+
+class ImageValidateResponse(BaseModel):
+    width: int
+    height: int
+    channels: int
+    format: str
+    aspectRatio: float
+    orientation: str
+    isValid: bool
+    fileSizeBytes: int
+    issues: list[str] = Field(default_factory=list)
+    source: str = "fastapi-opencv"
+
+
+class ImageAnalyzeResponse(BaseModel):
+    width: int
+    height: int
+    dominantColors: list[dict[str, Any]]
+    brightness: float
+    contrast: float
+    sharpness: float
+    edgeDensity: float
+    isLikelyFurniture: bool
+    isLikelyRoom: bool
+    recommendations: list[str] = Field(default_factory=list)
+    source: str = "fastapi-opencv"
+
+
+class ImageCompareRequest(BaseModel):
+    imageBase64A: str
+    imageBase64B: str
+
+
+class ImageCompareResponse(BaseModel):
+    similarity: float
+    histogramDistance: float
+    structuralDistance: float
+    sameScene: bool
+    source: str = "fastapi-opencv"
+
+
+def decode_base64_image(payload: str) -> tuple[np.ndarray, int]:
+    """Decode a base64 image string into an OpenCV BGR ndarray.
+
+    Returns (image, decoded_byte_size).
+    """
+    if not payload:
+        raise HTTPException(status_code=400, detail="imageBase64 is required.")
+
+    raw = payload.strip()
+    if "," in raw and raw.lower().startswith("data:"):
+        raw = raw.split(",", 1)[1]
+
+    try:
+        binary = base64.b64decode(raw, validate=False)
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=400, detail=f"Invalid base64 payload: {exc}") from exc
+
+    if not binary:
+        raise HTTPException(status_code=400, detail="Empty image payload after base64 decode.")
+
+    np_buffer = np.frombuffer(binary, dtype=np.uint8)
+    image = cv2.imdecode(np_buffer, cv2.IMREAD_COLOR)
+    if image is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Could not decode image. Supported formats: JPEG, PNG, WEBP, BMP.",
+        )
+    return image, len(binary)
+
+
+def kmeans_dominant_colors(image_bgr: np.ndarray, k: int = 5) -> list[dict[str, Any]]:
+    """Return top dominant colors as hex + RGB + percentage using k-means."""
+    small = cv2.resize(image_bgr, (96, 96), interpolation=cv2.INTER_AREA)
+    pixels = small.reshape(-1, 3).astype(np.float32)
+
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 20, 1.0)
+    _, labels, centers = cv2.kmeans(
+        pixels,
+        k,
+        None,
+        criteria,
+        attempts=3,
+        flags=cv2.KMEANS_PP_CENTERS,
+    )
+
+    counts = np.bincount(labels.flatten(), minlength=k).astype(np.float32)
+    total = float(counts.sum()) or 1.0
+    order = np.argsort(-counts)
+
+    result: list[dict[str, Any]] = []
+    for idx in order:
+        b, g, r = (int(round(float(v))) for v in centers[idx])
+        percent = round(float(counts[idx]) / total, 4)
+        hex_code = f"#{r:02x}{g:02x}{b:02x}"
+        result.append({"hex": hex_code, "rgb": [r, g, b], "percentage": percent})
+    return result
+
+
+def classify_furniture_or_room(image_bgr: np.ndarray) -> tuple[bool, bool, float, float, float, float]:
+    """Heuristic: detect wood-tone dominant colors + room characteristics.
+
+    Returns (isLikelyFurniture, isLikelyRoom, brightness, contrast, sharpness, edgeDensity).
+    """
+    hsv = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2HSV)
+    h, s, v = cv2.split(hsv)
+
+    brightness = round(float(np.mean(v)) / 255.0, 4)
+    contrast = round(float(np.std(v)) / 128.0, 4)
+
+    gray = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2GRAY)
+    laplacian_var = float(cv2.Laplacian(gray, cv2.CV_64F).var())
+    sharpness = round(min(1.0, laplacian_var / 500.0), 4)
+
+    edges = cv2.Canny(gray, 80, 180)
+    edge_density = round(float(np.count_nonzero(edges)) / float(edges.size or 1), 4)
+
+    h_channel = h.astype(np.float32)
+    wood_mask = ((h_channel >= 8) & (h_channel <= 35) & (s > 30) & (s < 220) & (v > 40) & (v < 230))
+    wood_ratio = float(np.count_nonzero(wood_mask)) / float(wood_mask.size or 1)
+    is_likely_furniture = wood_ratio > 0.18 and edge_density > 0.04
+
+    warm_neutral_mask = ((h_channel <= 35) | (h_channel >= 160)) & (s < 90) & (v > 90)
+    warm_neutral_ratio = float(np.count_nonzero(warm_neutral_mask)) / float(warm_neutral_mask.size or 1)
+    is_likely_room = (
+        warm_neutral_ratio > 0.45
+        and edge_density < 0.12
+        and brightness > 0.35
+        and contrast < 0.55
+    )
+
+    return is_likely_furniture, is_likely_room, brightness, contrast, sharpness, edge_density
+
+
+def build_recommendations(
+    *,
+    width: int,
+    height: int,
+    brightness: float,
+    contrast: float,
+    sharpness: float,
+    edge_density: float,
+    is_likely_furniture: bool,
+    is_likely_room: bool,
+) -> list[str]:
+    tips: list[str] = []
+    min_dim = min(width, height)
+    if min_dim < 600:
+        tips.append("Image resolution is low. Use at least 800x800 for marketplace product photos.")
+    if sharpness < 0.25:
+        tips.append("Image looks blurry. Re-capture with better lighting and a steady camera.")
+    if brightness < 0.25:
+        tips.append("Image is too dark. Increase lighting or exposure before uploading.")
+    if brightness > 0.85:
+        tips.append("Image is overexposed. Reduce direct light or camera exposure.")
+    if contrast < 0.08:
+        tips.append("Low contrast. Use a plain background to highlight the product.")
+    if is_likely_room and edge_density > 0.18:
+        tips.append("Room scene is busy. Try a cleaner angle so the furniture is the focus.")
+    if is_likely_furniture and not is_likely_room:
+        tips.append("Looks like a product shot. Use a white or neutral backdrop for best marketplace presentation.")
+    if not tips:
+        tips.append("Image quality looks good for marketplace and room preview use.")
+    return tips
+
+
+def orientation_label(width: int, height: int) -> str:
+    if width == height:
+        return "square"
+    return "landscape" if width > height else "portrait"
+
+
+@app.post("/ai/image/validate", response_model=ImageValidateResponse, dependencies=[Depends(verify_api_key)])
+def image_validate(request: ImageBase64Request) -> ImageValidateResponse:
+    image, byte_size = decode_base64_image(request.imageBase64)
+    height, width = image.shape[:2]
+    channels = image.shape[2] if image.ndim == 3 else 1
+    aspect = round(width / float(height or 1), 4)
+
+    issues: list[str] = []
+    is_valid = True
+    if byte_size > 10 * 1024 * 1024:
+        issues.append("Image exceeds 10 MB. Compress before upload.")
+        is_valid = False
+    if min(width, height) < 200:
+        issues.append("Image is too small. Minimum 200x200 pixels required.")
+        is_valid = False
+    if channels < 3:
+        issues.append("Color image required (3 channels).")
+
+    ext = (request.contentType or request.filename or "").lower()
+    fmt = "unknown"
+    if "png" in ext or image.shape[2] == 4 and "png" not in ext:
+        fmt = "png"
+    elif "webp" in ext:
+        fmt = "webp"
+    elif "bmp" in ext:
+        fmt = "bmp"
+    elif "jpg" in ext or "jpeg" in ext or ext == "":
+        fmt = "jpeg"
+    if not ext and request.filename and "." in request.filename:
+        fmt = request.filename.rsplit(".", 1)[-1].lower() or "jpeg"
+
+    return ImageValidateResponse(
+        width=width,
+        height=height,
+        channels=channels,
+        format=fmt,
+        aspectRatio=aspect,
+        orientation=orientation_label(width, height),
+        isValid=is_valid,
+        fileSizeBytes=byte_size,
+        issues=issues,
+    )
+
+
+@app.post("/ai/image/analyze", response_model=ImageAnalyzeResponse, dependencies=[Depends(verify_api_key)])
+def image_analyze(request: ImageBase64Request) -> ImageAnalyzeResponse:
+    image, _ = decode_base64_image(request.imageBase64)
+    height, width = image.shape[:2]
+
+    dominant = kmeans_dominant_colors(image, k=5)
+    is_furniture, is_room, brightness, contrast, sharpness, edge_density = classify_furniture_or_room(image)
+
+    recommendations = build_recommendations(
+        width=width,
+        height=height,
+        brightness=brightness,
+        contrast=contrast,
+        sharpness=sharpness,
+        edge_density=edge_density,
+        is_likely_furniture=is_furniture,
+        is_likely_room=is_room,
+    )
+
+    return ImageAnalyzeResponse(
+        width=width,
+        height=height,
+        dominantColors=dominant,
+        brightness=brightness,
+        contrast=contrast,
+        sharpness=sharpness,
+        edgeDensity=edge_density,
+        isLikelyFurniture=is_furniture,
+        isLikelyRoom=is_room,
+        recommendations=recommendations,
+    )
+
+
+@app.post("/ai/image/compare", response_model=ImageCompareResponse, dependencies=[Depends(verify_api_key)])
+def image_compare(request: ImageCompareRequest) -> ImageCompareResponse:
+    image_a, _ = decode_base64_image(request.imageBase64A)
+    image_b, _ = decode_base64_image(request.imageBase64B)
+
+    size = (256, 256)
+    a_resized = cv2.resize(image_a, size, interpolation=cv2.INTER_AREA)
+    b_resized = cv2.resize(image_b, size, interpolation=cv2.INTER_AREA)
+
+    a_hsv = cv2.cvtColor(a_resized, cv2.COLOR_BGR2HSV)
+    b_hsv = cv2.cvtColor(b_resized, cv2.COLOR_BGR2HSV)
+
+    a_hist = cv2.calcHist([a_hsv], [0, 1], None, [50, 60], [0, 180, 0, 256])
+    b_hist = cv2.calcHist([b_hsv], [0, 1], None, [50, 60], [0, 180, 0, 256])
+    cv2.normalize(a_hist, a_hist)
+    cv2.normalize(b_hist, b_hist)
+    hist_distance = round(float(cv2.compareHist(a_hist, b_hist, cv2.HISTCMP_BHATTACHARYYA)), 4)
+
+    a_gray = cv2.cvtColor(a_resized, cv2.COLOR_BGR2GRAY)
+    b_gray = cv2.cvtColor(b_resized, cv2.COLOR_BGR2GRAY)
+    structural_distance = round(
+        float(np.mean((a_gray.astype(np.float32) - b_gray.astype(np.float32)) ** 2)) / (255.0 ** 2),
+        4,
+    )
+
+    similarity = round(max(0.0, 1.0 - (hist_distance * 0.6 + structural_distance * 0.4)), 4)
+    same_scene = similarity >= 0.78
+
+    return ImageCompareResponse(
+        similarity=similarity,
+        histogramDistance=hist_distance,
+        structuralDistance=structural_distance,
+        sameScene=same_scene,
     )

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node src/server.js",
     "start": "node src/server.js",
-    "build": "cd ../frontend && npm install && npm run build"
+    "build": "echo \"No build step required for API\""
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

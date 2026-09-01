@@ -24,6 +24,12 @@ uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 - `POST /ai/chat`
 - `POST /ai/stock-decision`
 - `POST /ai/quote-estimate`
+- `POST /ai/customization-recommendations`
+- `POST /ai/image/validate` — base64 image → size/format/orientation check
+- `POST /ai/image/analyze` — base64 image → dominant colors, brightness, sharpness, furniture/room heuristic
+- `POST /ai/image/compare` — two base64 images → similarity score
+
+All AI endpoints require the `x-api-key` header matching `AI_SERVICE_API_KEY`.
 
 ## Role In The App
 

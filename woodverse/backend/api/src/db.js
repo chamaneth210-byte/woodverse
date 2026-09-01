@@ -2,13 +2,11 @@ import { readFile } from "node:fs/promises";
 import dns from "node:dns";
 import { Pool } from "pg";
 
-dns.setDefaultResultOrder("ipv4first");
-
 const databaseUrl = process.env.DATABASE_URL;
 
 export const databaseConfigured = Boolean(databaseUrl);
 export const pool = databaseConfigured
-    ? new Pool({ connectionString: databaseUrl, max: Number(process.env.DB_POOL_SIZE || 10), ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: true } : undefined, family: 4 })
+    ? new Pool({ connectionString: databaseUrl, max: Number(process.env.DB_POOL_SIZE || 10), ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: true } : undefined })
     : null;
 
 export async function query(text, values = []) {

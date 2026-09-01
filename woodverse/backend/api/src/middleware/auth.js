@@ -1,4 +1,7 @@
 import { verifyToken } from "../utils/auth.js";
+import { authorizeRoles } from "./rbac.js";
+
+export { authorizeRoles };
 
 export function authenticateToken(request, response, next) {
   const header = request.headers.authorization;

@@ -13,8 +13,15 @@
 1. Go to https://supabase.com → Sign up
 2. New project → Name: `woodverse-db`
 3. Go to **Settings → Database → Connection string**
-4. Copy the **URI** format connection string
+4. Use the **Supabase pooler** URL (port 5432 or 6543) for IPv4 connectivity from Railway:
+   ```
+   postgresql://postgres.your-project-ref:YOUR_PASSWORD@aws-0-<region>.pooler.supabase.com:5432/postgres
+   ```
+   Common regions: `ap-southeast-1`, `ap-southeast-2`, `us-east-1`, `eu-west-1`. Find yours in the dashboard under Settings → Database → Connection Pooling.
 5. Save this as `DATABASE_URL`
+6. Set `DB_SSL=true`
+
+Note: The direct connection (`db.xxx.supabase.co:5432`) is often IPv6-only and may not be reachable from Railway. Always prefer the pooler URL.
 
 ### 2. Backend API: Railway
 

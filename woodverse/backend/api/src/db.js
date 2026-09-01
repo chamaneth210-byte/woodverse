@@ -32,6 +32,7 @@ function buildCandidates(rawUrl) {
     if (parsed.hostname.endsWith(".supabase.co")) {
       const ref = parsed.hostname.split(".")[0].replace(/^db\./, "");
       const regions = [
+        "aws-0-ap-southeast-2",
         "aws-0-ap-southeast-1",
         "aws-0-ap-south-1",
         "aws-0-ap-northeast-1",

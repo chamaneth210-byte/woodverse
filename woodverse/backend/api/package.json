@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node src/server.js",
     "start": "node src/server.js",
-    "build": "echo \"No build step required for API\""
+    "build": "echo \"No build step required for API\"",
+    "postinstall": "cp ../../database/schema.sql ./schema.sql 2>/dev/null || true"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

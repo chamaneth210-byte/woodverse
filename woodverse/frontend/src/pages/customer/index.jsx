@@ -753,11 +753,43 @@ function LoginPage({ onAuthSuccess }) {
               const accounts = JSON.parse(localStorage.getItem("woodverse-accounts") || "[]");
               const nextAccount = { email: registeredEmail, role: accountType, status: requiresVerification ? "Pending Approval" : "Active", createdAt: new Date().toISOString() };
               localStorage.setItem("woodverse-accounts", JSON.stringify([{ ...nextAccount }, ...accounts.filter((account) => account.email !== registeredEmail)]));
-              try {
-                const password = String(formData.get("password") || "");
-                const result = await apiRequest("/api/users", { method: "POST", body: JSON.stringify({ email: registeredEmail, fullName: `${formData.get("firstName")} ${formData.get("lastName")}`.trim(), role: accountType, password }) });
+            try {
+              const password = String(formData.get("password") || "");
+
+              if (accountType === "customer") {
+                const result = await apiRequest("/api/auth/register", {
+                  method: "POST",
+                  body: JSON.stringify({
+                    email: registeredEmail,
+                    fullName: `${formData.get("firstName")} ${formData.get("lastName")}`.trim(),
+                    password,
+                  }),
+                });
+
+                localStorage.setItem("woodverse-auth-token", result.token);
                 localStorage.setItem("woodverse-api-user", JSON.stringify(result.user));
-              } catch {}
+              } else {
+                const result = await apiRequest("/api/users", {
+                  method: "POST",
+                  body: JSON.stringify({
+                    email: registeredEmail,
+                    fullName: `${formData.get("firstName")} ${formData.get("lastName")}`.trim(),
+                    role: accountType,
+                    password,
+                  }),
+                });
+
+                localStorage.setItem(
+                  "woodverse-api-user",
+                  JSON.stringify(result.user)
+                );
+              }
+            } catch (error) {
+              setRegistrationMessage(
+                error.message || "Registration failed. Please try again."
+              );
+              return;
+            }
               publishAdminEvent(accountType === "customer" ? "Customer" : accountType === "vendor" ? "Vendor" : "Supplier", `${selectedAccount.label} registration received`, `${registeredEmail} created a ${selectedAccount.label.toLowerCase()} account${requiresVerification ? " with documents pending admin approval" : ""}.`, requiresVerification ? "High" : "Normal");
               setAuthMode("signin");
               return;

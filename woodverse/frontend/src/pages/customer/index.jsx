@@ -1022,24 +1022,55 @@ function AuthShell({ children }) {
   );
 }
 
-function AuthField({ name, label, placeholder, type = "text", autoComplete, icon: Icon, trailingIcon: TrailingIcon, labelAction, className = "" }) {
+function AuthField({
+  name,
+  label,
+  placeholder,
+  type = "text",
+  autoComplete,
+  icon: Icon,
+  trailingIcon: TrailingIcon,
+  labelAction,
+  className = "",
+}) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPassword = type === "password";
+
   return (
-    <label className={`grid min-w-0 gap-2 text-sm font-bold text-[#3e4744] ${className}`}>
+    <label
+      className={`grid min-w-0 gap-2 text-sm font-bold text-[#3e4744] ${className}`}
+    >
       <span className="flex min-w-0 items-center justify-between gap-4">
         <span className="min-w-0 break-words">{label}</span>
         {labelAction}
       </span>
+
       <span className="flex min-h-[50px] min-w-0 items-center gap-4 rounded-md border border-[#c9d4cf] bg-[#eaf3ff] px-5 focus-within:border-[#164f40]">
         {Icon && <Icon className="h-5 w-5 shrink-0 text-[#b4beb9]" />}
+
         <input
           name={name}
-          type={type}
+          type={isPassword && showPassword ? "text" : type}
           required
           autoComplete={autoComplete}
           className="min-w-0 flex-1 bg-transparent text-base text-[#151d28] outline-none placeholder:text-[#697482]"
           placeholder={placeholder}
         />
-        {TrailingIcon && <TrailingIcon className="h-5 w-5 shrink-0 text-[#b4beb9]" />}
+
+        {TrailingIcon && (
+          <button
+            type="button"
+            onClick={() => {
+              if (isPassword) {
+                setShowPassword((current) => !current);
+              }
+            }}
+            className="shrink-0 cursor-pointer"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            <TrailingIcon className="h-5 w-5 text-[#b4beb9]" />
+          </button>
+        )}
       </span>
     </label>
   );

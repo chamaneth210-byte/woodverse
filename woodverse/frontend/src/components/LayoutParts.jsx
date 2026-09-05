@@ -87,7 +87,7 @@ function FooterLinks({ title, links, onOpen }) {
 
 export function ChatLauncher() {
   return (
-    <button onClick={() => navigate("/chatbot")} className="fixed bottom-5 right-5 z-30 grid h-14 w-14 place-items-center rounded-full bg-forest text-white shadow-dark sm:bottom-8 sm:right-8 sm:h-16 sm:w-16" aria-label="Open chat assistant">
+    <button onClick={() => navigate("/chatbot")} className="fixed bottom-3 right-5 z-30 grid h-14 w-14 place-items-center rounded-full bg-forest text-white shadow-dark sm:bottom-5 sm:right-8 sm:h-16 sm:w-16" aria-label="Open chat assistant">
       <MessageSquare className="h-7 w-7 sm:h-8 sm:w-8" />
       <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-rose-500 px-1 text-[10px] font-extrabold">1</span>
     </button>

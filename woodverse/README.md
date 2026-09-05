@@ -1,21 +1,16 @@
 # WoodVerse
 
-## Document Information
+## Project Overview
 
-- Project: WoodVerse
-- Status: Draft
-- Version: 1.0
-- Last Updated: To be updated
-- Owner: WoodVerse Development Team
+WoodVerse is an AI-assisted multi-vendor commerce and production platform for furniture, wooden products, custom fabrication, supplier workflows, inventory operations, payments, shipping, support, and administration.
 
-## Project Context
+The platform is organized as a monorepo with three main runtime services:
 
-WoodVerse is an AI-assisted multi-vendor web platform for furniture,
-wooden products, wooden gifts, standard laser-cut files, indoor plants,
-custom furniture, supplier management, inventory, production tracking,
-payments, shipments, support, and administration.
+- Frontend: React + Vite + Tailwind
+- API: Node.js + Express + Socket.IO
+- AI service: Python + FastAPI
 
-Main roles:
+## Core Roles
 
 - Customer
 - Vendor / Seller
@@ -23,7 +18,7 @@ Main roles:
 - Support Staff
 - System Administrator
 
-Technology stack:
+## Tech Stack
 
 - React.js
 - Tailwind CSS
@@ -37,87 +32,107 @@ Technology stack:
 - MiDaS / DPT
 - Socket.IO
 
-
-## Overview
-
-WoodVerse is a multi-role platform for furniture ecommerce, product
-customization, vendor operations, suppliers, production tracking, inventory,
-payments, shipments, AI assistance, support, and administration.
-
 ## Repository Structure
 
-```
+```bash
 woodverse/
-├── package.json          # Root monorepo config (npm workspaces)
-├── frontend/             # React frontend (Vite + Tailwind)
+├── package.json             # Root workspace scripts
+├── frontend/                # React app
+│   ├── package.json
 │   ├── src/
-│   │   ├── pages/
-│   │   │   ├── customer/   # Customer-facing pages
-│   │   │   ├── vendor/     # Vendor portal pages
-│   │   │   ├── admin/      # Admin console pages
-│   │   │   └── supplier/   # Supplier portal pages
-│   │   ├── components/     # Shared UI components
-│   │   ├── data/           # Frontend mock data
-│   │   └── utils.js        # Client-side helpers
-│   └── package.json
-├── backend/              # Backend services
-│   ├── api/              # Node.js/Express backend
-│   │   ├── src/
-│   │   │   ├── routes/    # Modular route handlers
-│   │   │   ├── utils/     # Shared server utilities
-│   │   │   ├── data/      # In-memory fallback data
-│   │   │   ├── socket.js  # Socket.IO handlers
-│   │   │   ├── db.js      # PostgreSQL connection
-│   │   │   └── server.js  # Entry point
-│   │   └── package.json
-│   └── ai-service/       # Python FastAPI AI service
-│       ├── src/
-│       │   └── main.py
-│       └── requirements.txt
-├── database/             # PostgreSQL schema and migrations
+│   ├── public/
+│   ├── vite.config.js
+│   └── index.html
+├── backend/
+│   ├── api/                 # Express API service
+│   │   ├── package.json
+│   │   └── src/
+│   └── ai-service/          # FastAPI AI service
+│       ├── package.json
+│       ├── requirements.txt
+│       └── src/
+├── database/
 │   ├── schema.sql
 │   ├── seed.sql
 │   └── README.md
-└── docs/                 # Product, architecture, API, security, testing, and deployment docs
+├── docs/
+│   └── ...
+├── DEPLOYMENT.md
+├── DEPLOYMENT_GUIDE.md
+├── package-lock.json
+└── README.md
 ```
 
-## Getting Started
+## Prerequisites
 
-### Prerequisites
+- Node.js 18+
+- npm 9+
+- Python 3.10+
+- PostgreSQL 14+
 
-- Node.js >= 18
-- PostgreSQL >= 14
-- Python >= 3.10 (for AI service)
+## Installation
 
-### Install
+From the project root:
 
 ```bash
 cd woodverse
-npm run install:all
+npm install
 ```
 
-### Development
+For the AI service Python environment:
 
 ```bash
-# Run all services
+cd woodverse
+python -m venv .venv
+source .venv/bin/activate
+pip install -r backend/ai-service/requirements.txt
+```
+
+## Local Development
+
+From the project root, start the local app stack:
+
+```bash
+cd woodverse
+npm install
 npm run dev
-
-# Or run individually
-npm run dev:web    # Frontend at http://localhost:5173
-npm run dev:api    # Backend at http://localhost:4000
-npm run dev:ai     # AI service at http://localhost:8000
 ```
 
-### Build
+Then open the app in your browser:
+
+- Frontend: http://localhost:5173
+- API: http://localhost:4000
+- AI service: http://localhost:8000
+
+To run services individually:
 
 ```bash
+cd woodverse
+npm run dev:web
+npm run dev:api
+npm run dev:ai
+```
+
+## Build
+
+```bash
+cd woodverse
 npm run build
 ```
 
+The root build script currently compiles the frontend application.
+
+## Additional Notes
+
+- The root workspace uses npm workspaces.
+- API and frontend scripts are defined in their package manifests.
+- The AI service runs via `uvicorn` and uses the service's Python requirements file.
+
 ## Documentation
 
-Start with:
+Start with these project docs:
 
 - `docs/FULL_SYSTEM_DOCUMENTATION.md`
 - `docs/architecture/SYSTEM_ARCHITECTURE.md`
 - `docs/phases/IMPLEMENTATION_ROADMAP.md`
+- `DEPLOYMENT_GUIDE.md`

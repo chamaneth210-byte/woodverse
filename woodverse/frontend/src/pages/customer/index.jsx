@@ -953,7 +953,7 @@ function LoginPage({ onAuthSuccess }) {
               </fieldset>
               <div className="mt-11 grid gap-7">
                 <AuthField name="email" label="Email Address" placeholder="name@company.com" type="email" autoComplete="email" icon={Mail} />
-                <AuthField name="password" label="Password" placeholder="••••••••" type="password" autoComplete="current-password" icon={Lock} trailingIcon={Eye} labelAction={<button type="button" onClick={() => navigate("/forgot-password")} className="font-semibold text-[#164f40]">Forgot Password?</button>} />
+                <AuthField name="password" label="Password" placeholder="••••••••" type="password" autoComplete="current-password" icon={Lock} trailingIcon={Eye} />
               </div>
 
               <div className="mt-6 flex min-w-0 items-center justify-between gap-4 text-sm max-sm:flex-col max-sm:items-start">
@@ -982,6 +982,14 @@ function LoginPage({ onAuthSuccess }) {
             className="min-h-[70px] rounded-md border border-[#8b5633] bg-white px-4 font-bold text-[#8b5633]"
           >
             {isRegister ? "Sign In Instead" : "Create New Account"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigate("/forgot-password")}
+            className="mt-4 min-h-[52px] rounded-md border border-[#d9e5e0] bg-[#f3faf6] px-4 font-bold text-[#164f40]"
+          >
+            Forgot Password?
           </button>
 
           <p className="mt-auto pt-16 text-xs font-semibold leading-snug tracking-wide text-[#7b827e] max-lg:pt-10">

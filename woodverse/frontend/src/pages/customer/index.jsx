@@ -87,7 +87,7 @@ function AnimatedStat({ value, suffix = "" }) {
     const finish = () => {
       if (hasStarted.current) return;
       hasStarted.current = true;
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches || typeof IntersectionObserver === "undefined") {
         setDisplayValue(value);
         return;
       }
@@ -102,6 +102,11 @@ function AnimatedStat({ value, suffix = "" }) {
       };
       window.requestAnimationFrame(animate);
     };
+
+    if (typeof IntersectionObserver === "undefined") {
+      finish();
+      return undefined;
+    }
 
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {

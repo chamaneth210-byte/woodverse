@@ -4,6 +4,7 @@ import { navigate } from "../utils";
 
 const links = [
   ["Home", "/"],
+  ["Features", "/features"],
   ["Shop", "/shop"],
   ["Furniture", "/furniture"],
   ["Wooden gifts", "/wooden-gifts"],
@@ -60,7 +61,7 @@ export function Header({ path, theme, onToggleTheme, cartCount, isLoggedIn }) {
           className="inline-flex h-9 min-w-9 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-2.5 text-sm font-bold text-slate-600 shadow-sm transition hover:border-forest hover:text-forest dark:border-slate-700 dark:bg-[#202624] dark:text-stone-300 dark:hover:border-emerald-200 dark:hover:text-emerald-200 sm:min-w-24 sm:px-3"
         >
           <UserRound className="h-5 w-5 shrink-0" />
-          <span className="max-sm:hidden">{isLoggedIn ? "Account" : "Sign in"}</span>
+          <span className="max-sm:hidden">{isLoggedIn ? "Account" : "Get it free"}</span>
         </button>
       </div>
     </header>

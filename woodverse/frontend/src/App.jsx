@@ -9,6 +9,7 @@ import {
   CategoryPage,
   ChatbotPage,
   DeliveryPage,
+  FeaturesPage,
   ForgotPasswordPage,
   HomePage,
   LoginPage,
@@ -38,6 +39,7 @@ const VendorWarehousesPage = lazyPage(() => import("./pages/vendor/index"), "Ven
 
 const routeMap = {
   "/": "home",
+  "/features": "features",
   "/shop": "shop",
   "/furniture": "furniture",
   "/wooden-gifts": "gifts",
@@ -150,6 +152,7 @@ export default function App() {
       {!isAuthPage && !isStandalonePage && page !== "home" && <Header path={path} theme={theme} cartCount={cartCount} isLoggedIn={isLoggedIn} onToggleTheme={toggleTheme} />}
       <Suspense fallback={<RouteLoading standalone={isStandalonePage} />}>
         {page === "home" && <HomePage addToCart={(item) => addToCart(item, setCart)} />}
+        {page === "features" && <FeaturesPage />}
         {page === "shop" && <CatalogPage title="Explore All WoodVerse Collections" subtitle="Browse furniture, wooden gifts, and timber products from verified Sri Lankan vendors." items={catalogProducts} addToCart={(item) => addToCart(item, setCart)} />}
         {page === "furniture" && <CategoryPage type="furniture" items={catalogProducts} addToCart={(item) => addToCart(item, setCart)} />}
         {page === "gifts" && <CategoryPage type="gift" items={catalogProducts} addToCart={(item) => addToCart(item, setCart)} />}

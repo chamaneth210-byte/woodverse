@@ -790,7 +790,7 @@ function VendorProductsPage() {
                 </div>
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} onEdit={() => openEditProduct(product)} onRestock={() => restockProduct(product)} onStatus={updateStatus} />
                 ))}
@@ -3209,28 +3209,28 @@ function VendorSidebar({ active = "Dashboard", onNavigate, onNewOrder }) {
 
 function VendorHeader({ onAction, onNotifications, unreadCount, status }) {
   return (
-    <header className="sticky top-0 z-10 flex min-h-16 flex-wrap items-center justify-between gap-4 border-b border-[#d4d1ca] bg-[#fbf8f1]/95 px-5 py-3 backdrop-blur sm:px-8 lg:px-10">
+    <header className="sticky top-0 z-10 flex min-h-16 flex-wrap items-center justify-between gap-3 border-b border-[#d4d1ca] bg-[#fbf8f1]/95 px-5 py-3 backdrop-blur sm:px-8 lg:px-10">
       <label className="flex h-10 w-full max-w-[520px] items-center rounded-full bg-[#eeeae4] px-4 text-[#747a76]">
         <Search className="h-5 w-5 shrink-0" />
         <input className="min-w-0 flex-1 bg-transparent px-3 text-sm outline-none" placeholder="Search orders, products..." />
       </label>
 
-      <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-        <button onClick={onNotifications} className="relative grid h-10 w-10 place-items-center rounded-full text-[#3d4541] transition hover:bg-[#eeeae4]" aria-label="Notifications">
+      <div className="ml-auto flex min-w-0 items-center justify-end gap-2.5 sm:gap-4">
+        <button onClick={onNotifications} className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full text-[#3d4541] transition hover:bg-[#eeeae4]" aria-label="Notifications">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#d24b53] px-1 text-[10px] font-extrabold text-white">{unreadCount}</span>}
         </button>
-        <span className={`hidden rounded-full px-2.5 py-1 text-xs font-extrabold uppercase sm:inline-flex ${status === "Connected" ? "bg-[#d9ecd8] text-[#115745]" : "bg-[#fff0cd] text-[#8b5633]"}`}>
+        <span className={`hidden shrink-0 rounded-full px-2.5 py-1 text-xs font-extrabold uppercase sm:inline-flex ${status === "Connected" ? "bg-[#d9ecd8] text-[#115745]" : "bg-[#fff0cd] text-[#8b5633]"}`}>
           {status}
         </span>
-        <button onClick={() => navigate("/vendor/settings")} className="grid h-10 w-10 place-items-center rounded-full transition hover:bg-[#eeeae4]" aria-label="Settings"><Settings className="h-5 w-5" /></button>
-        <button onClick={() => navigate("/vendor/help")} className="grid h-10 w-10 place-items-center rounded-full transition hover:bg-[#eeeae4]" aria-label="Help"><HelpCircle className="h-5 w-5" /></button>
-        <span className="hidden h-8 w-px bg-[#d4d1ca] sm:block" />
-        <div className="hidden text-right sm:block">
-          <strong className="block leading-tight text-[#202621]">Aruni Perera</strong>
-          <span className="text-xs font-bold uppercase tracking-wide text-[#68716c]">Master Artisan</span>
+        <button onClick={() => navigate("/vendor/settings")} className="grid h-10 w-10 shrink-0 place-items-center rounded-full transition hover:bg-[#eeeae4]" aria-label="Settings"><Settings className="h-5 w-5" /></button>
+        <button onClick={() => navigate("/vendor/help")} className="grid h-10 w-10 shrink-0 place-items-center rounded-full transition hover:bg-[#eeeae4]" aria-label="Help"><HelpCircle className="h-5 w-5" /></button>
+        <span className="hidden h-8 w-px shrink-0 bg-[#d4d1ca] sm:block" />
+        <div className="hidden min-w-0 text-right sm:block">
+          <strong className="block truncate leading-tight text-[#202621]">Aruni Perera</strong>
+          <span className="block text-xs font-bold uppercase tracking-wide text-[#68716c]">Master Artisan</span>
         </div>
-        <button onClick={() => navigate("/vendor/profile")} className="grid h-11 w-11 place-items-center rounded-full border-2 border-[#115745] bg-[#d8c0a4] font-extrabold text-[#115745]" aria-label="Vendor profile">AP</button>
+        <button onClick={() => navigate("/vendor/profile")} className="grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-[#115745] bg-[#d8c0a4] font-extrabold text-[#115745]" aria-label="Vendor profile">AP</button>
       </div>
     </header>
   );
@@ -3360,39 +3360,39 @@ function FulfillmentPlanPanel({ plan }) {
 function ProductCard({ product, onEdit, onRestock, onStatus }) {
   const isArchived = product.status === "Archived";
   return (
-    <article className="overflow-hidden rounded-xl border border-[#c2cac5] bg-white shadow-sm">
-      <div className="aspect-[4/3] overflow-hidden bg-[#f3eee6]">
+    <article className="w-full overflow-hidden rounded-xl border border-[#c2cac5] bg-white shadow-sm">
+      <div className="aspect-[5/4] overflow-hidden bg-[#f3eee6]">
         <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
       </div>
-      <div className="grid gap-4 p-4">
+      <div className="grid gap-3 p-3">
         <div>
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-semibold leading-tight text-[#202621]">{product.name}</h2>
-              <p className="mt-1 text-sm text-[#66716b]">{product.category} - {product.material}</p>
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base font-semibold leading-tight text-[#202621]">{product.name}</h2>
+              <p className="mt-1 text-xs text-[#66716b]">{product.category} - {product.material}</p>
             </div>
-            <span className={`rounded-full px-2.5 py-1 text-xs font-extrabold uppercase ${product.status === "Published" ? "bg-[#d9ecd8] text-[#115745]" : product.status === "Draft" ? "bg-[#fff0cd] text-[#8b5633]" : "bg-[#e9e4dc] text-[#66716b]"}`}>
+            <span className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-extrabold uppercase ${product.status === "Published" ? "bg-[#d9ecd8] text-[#115745]" : product.status === "Draft" ? "bg-[#fff0cd] text-[#8b5633]" : "bg-[#e9e4dc] text-[#66716b]"}`}>
               {product.status}
             </span>
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-lg bg-[#f8f4ec] px-3 py-2">
-              <span className="block text-xs font-extrabold uppercase text-[#66716b]">Price</span>
-              <strong>{product.price}</strong>
+          <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+            <div className="rounded-lg bg-[#f8f4ec] px-2.5 py-2">
+              <span className="block text-[10px] font-extrabold uppercase text-[#66716b]">Price</span>
+              <strong className="mt-1 block text-[13px]">{product.price}</strong>
             </div>
-            <div className="rounded-lg bg-[#f8f4ec] px-3 py-2">
-              <span className="block text-xs font-extrabold uppercase text-[#66716b]">Stock</span>
-              <strong className={product.stock <= 10 ? "text-[#d24b53]" : "text-[#202621]"}>{product.stock} units</strong>
+            <div className="rounded-lg bg-[#f8f4ec] px-2.5 py-2">
+              <span className="block text-[10px] font-extrabold uppercase text-[#66716b]">Stock</span>
+              <strong className={`mt-1 block text-[13px] ${product.stock <= 10 ? "text-[#d24b53]" : "text-[#202621]"}`}>{product.stock} units</strong>
             </div>
           </div>
         </div>
 
         <div className="grid gap-2">
           <div className="grid grid-cols-2 gap-2">
-            <button onClick={onEdit} className="min-h-10 rounded-lg border border-[#c4cbc7] bg-white px-3 text-sm font-extrabold text-[#3d4541]">Edit</button>
-            <button onClick={onRestock} className="min-h-10 rounded-lg bg-[#eef4ef] px-3 text-sm font-extrabold text-[#115745]">Restock</button>
+            <button onClick={onEdit} className="min-h-9 rounded-lg border border-[#c4cbc7] bg-white px-2 text-xs font-extrabold text-[#3d4541]">Edit</button>
+            <button onClick={onRestock} className="min-h-9 rounded-lg bg-[#eef4ef] px-2 text-xs font-extrabold text-[#115745]">Restock</button>
           </div>
-          <button onClick={() => onStatus(product.id, isArchived ? "Published" : "Archived")} className="min-h-10 rounded-lg bg-[#e9e4dc] px-3 text-sm font-extrabold text-[#3d4541]">
+          <button onClick={() => onStatus(product.id, isArchived ? "Published" : "Archived")} className="min-h-9 rounded-lg bg-[#e9e4dc] px-2 text-xs font-extrabold text-[#3d4541]">
             {isArchived ? "Publish Product" : "Archive Product"}
           </button>
         </div>

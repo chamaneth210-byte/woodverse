@@ -3,8 +3,6 @@ import { BrandLogo } from "./BrandLogo";
 import { navigate } from "../utils";
 
 const links = [
-  ["Home", "/"],
-  ["Features", "/features"],
   ["Shop", "/shop"],
   ["Furniture", "/furniture"],
   ["Wooden gifts", "/wooden-gifts"],

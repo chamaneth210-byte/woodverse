@@ -148,10 +148,9 @@ function HomePage({ addToCart }) {
   };
   const homeLinks = [
     ["Home", "#top"],
-    ["Features", "/features"],
+    ["Features", "#features"],
     ["About", "#about"],
     ["Services", "#services"],
-    ["Features", "#features"],
     ["How It Works", "#how-it-works"],
     ["Pricing", "#pricing"],
     ["FAQ", "#faq"],
@@ -185,10 +184,9 @@ function HomePage({ addToCart }) {
             <h1 className="mt-7 break-words text-5xl font-extrabold leading-[1.04] sm:text-6xl lg:text-7xl">Build better woodcraft, together.</h1>
             <p className="mt-6 max-w-xl break-words text-lg leading-relaxed text-emerald-50/80 sm:text-xl">WoodVerse brings customers, verified vendors, and trusted suppliers into one place, from the first product search to final delivery.</p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <button onClick={() => navigate("/shop")} className="inline-flex min-h-13 items-center gap-2 rounded-lg bg-[#d8a36b] px-6 font-extrabold text-[#17231f] shadow-xl transition hover:-translate-y-1 hover:bg-[#e4b57e]">Get Started <ArrowRight className="h-5 w-5" /></button>
+              <button onClick={() => navigate("/shop")} className="inline-flex min-h-13 items-center gap-2 rounded-lg bg-[#d8a36b] px-6 font-extrabold text-[#17231f] shadow-xl transition hover:-translate-y-1 hover:bg-[#e4b57e]">Get it free <ArrowRight className="h-5 w-5" /></button>
               <button onClick={() => scrollTo("#about")} className="inline-flex min-h-13 items-center gap-2 rounded-lg border border-white/25 bg-white/10 px-6 font-extrabold text-white backdrop-blur transition hover:bg-white/15"><Play className="h-4 w-4 fill-current" /> Learn More</button>
             </div>
-            <div className="mt-12 flex flex-wrap gap-8 text-sm text-emerald-50/70"><span><strong className="block text-2xl text-white">2,400+</strong>Crafted orders</span><span><strong className="block text-2xl text-white">184</strong>Verified vendors</span><span><strong className="block text-2xl text-white">42</strong>Material suppliers</span></div>
           </div>
           <div className="rounded-2xl border border-white/20 bg-white/10 p-3 shadow-2xl backdrop-blur-xl animate-[float_6s_ease-in-out_infinite]">
             <div className="overflow-hidden rounded-xl bg-[#f5f7f2] text-[#17231f] shadow-inner dark:bg-[#1b2823] dark:text-stone-100">
@@ -206,6 +204,21 @@ function HomePage({ addToCart }) {
 
       <section id="services" className="scroll-mt-24 border-y border-[#dce5df] bg-white py-20 dark:border-white/10 dark:bg-[#101714]"><div className="page-shell"><SectionHeading title="One platform, three clear paths" subtitle="Choose the workflow that matches your role. Every path stays connected to the same order and material network." /><div className="grid gap-5 lg:grid-cols-3">{[[UserRound, "Customers", "Discover verified furniture, place orders, and follow every step through production and delivery.", "/shop", "Browse marketplace"], [Store, "Vendors", "Publish products, evaluate stock, approve manufacturing, and manage customer fulfillment.", "/vendor-dashboard", "Open vendor portal"], [Warehouse, "Suppliers", "Submit verification documents, maintain material availability, and respond to purchase requests.", "/supplier/profile", "Open supplier portal"]].map(([Icon, title, detail, href, action]) => <article key={title} className="group grid gap-5 rounded-2xl border border-[#dce5df] bg-[#f7f8f5] p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-white/10 dark:bg-white/5"><span className="grid h-12 w-12 place-items-center rounded-xl bg-[#dbeee3] text-[#1c614f] transition group-hover:bg-[#1c614f] group-hover:text-white dark:bg-[#29483b] dark:text-emerald-100"><Icon className="h-6 w-6" /></span><div><h3 className="text-xl font-extrabold">{title}</h3><p className="mt-3 text-sm leading-relaxed text-[#65736c] dark:text-stone-300">{detail}</p></div><button onClick={() => navigate(href)} className="inline-flex min-h-11 w-fit items-center gap-2 rounded-lg bg-[#1c614f] px-4 text-sm font-extrabold text-white">{action}<ArrowRight className="h-4 w-4" /></button></article>)}</div></div></section>
       <section id="features" className="scroll-mt-24 bg-[#edf3ee] py-24 dark:bg-[#14221d]"><div className="page-shell"><SectionHeading title="Everything your operation needs" subtitle="One calm workspace for commerce, coordination, and growth." /><div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{[[ShoppingCart, "Customer marketplace", "Discover verified furniture, compare products, and order with confidence."], [Store, "Vendor operations", "Manage catalog, quotations, customer orders, and vendor approvals."], [Warehouse, "Supplier network", "Connect available timber and materials to real production demand."], [PackageCheck, "Order fulfillment", "Move every order from stock decision to shipment and delivery."], [Factory, "Production tracking", "Create work orders only when manufacturing is needed and approved."], [ShieldIcon, "Document verification", "Keep vendor and supplier registration documents in one review flow."], [BarChart3, "Business insights", "See sales, inventory, delivery, and supplier performance clearly."], [MessageSquare, "Real-time communication", "Keep customers, vendors, and suppliers aligned with live updates."]].map(([Icon, title, detail]) => <article key={title} className="group rounded-2xl border border-white/80 bg-white/80 p-6 shadow-sm transition duration-300 hover:-translate-y-2 hover:shadow-xl dark:border-white/10 dark:bg-white/5"><span className="grid h-12 w-12 place-items-center rounded-xl bg-[#dbeee3] text-[#1c614f] transition group-hover:bg-[#1c614f] group-hover:text-white dark:bg-[#28483b] dark:text-emerald-100"><Icon className="h-6 w-6" /></span><h3 className="mt-5 text-lg font-extrabold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-[#65736c] dark:text-stone-300">{detail}</p></article>)}</div></div></section>
+
+      <section className="bg-[#edf3ee] py-20 dark:bg-[#14221d]">
+        <div className="page-shell">
+          <SectionHeading title="Why teams choose WoodVerse" subtitle="A sharper workflow for discovery, production, and delivery." />
+          <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {[[ShoppingCart, "Marketplace", "Browse verified furniture and gifts with clear product context."], [Store, "Vendor tools", "Keep pricing, stock, and customer orders in one workspace."], [Factory, "Production flow", "Turn approved orders into manufacturing work with visible status."], [ShieldIcon, "Trust & control", "Keep documents, verification, and order communication neatly aligned."]].map(([Icon, title, detail]) => (
+              <article key={title} className="rounded-2xl border border-white/80 bg-white/80 p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-white/10 dark:bg-white/5">
+                <span className="grid h-12 w-12 place-items-center rounded-xl bg-[#dbeee3] text-[#1c614f] dark:bg-[#28483b] dark:text-emerald-100"><Icon className="h-6 w-6" /></span>
+                <h3 className="mt-5 text-lg font-extrabold">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#65736c] dark:text-stone-300">{detail}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <section id="how-it-works" className="page-shell py-24"><SectionHeading title="How WoodVerse works" subtitle="A simple flow that keeps every handoff visible." /><div className="relative grid gap-8 md:grid-cols-4">{[[Search, "1", "Discover", "Customers find the right product or material."], [ClipboardList, "2", "Coordinate", "Vendors review stock and supplier availability."], [Factory, "3", "Create", "Approved manufacturing work becomes production tracking."], [Truck, "4", "Deliver", "Shipments move to the customer with clear status updates."]].map(([Icon, number, title, detail]) => <article key={number} className="group relative text-center"><span className="absolute left-1/2 top-7 hidden h-px w-full bg-[#bdd6c7] md:block" style={{ transform: "translateX(50%)" }} /><span className="relative z-10 mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#1c614f] text-white shadow-lg transition duration-300 group-hover:-translate-y-1 group-hover:scale-105 group-hover:shadow-xl"><Icon className="h-7 w-7" /></span><span className="absolute left-1/2 top-[-1.25rem] z-20 grid h-8 w-8 -translate-x-1/2 place-items-center rounded-full bg-[#dbeee3] text-sm font-black text-[#1c614f] shadow-sm transition duration-300 group-hover:-translate-y-1 group-hover:bg-[#d8a36b] dark:bg-[#29463a] dark:text-emerald-100">{number}</span><h3 className="relative mt-5 text-xl font-extrabold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-[#65736c] dark:text-stone-300">{detail}</p></article>)}</div></section>
 

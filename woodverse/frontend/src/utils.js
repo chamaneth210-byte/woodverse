@@ -115,7 +115,7 @@ function decodeJwt(token) {
 }
 
 export async function apiRequest(path, options = {}) {
-  const baseUrl = import.meta.env.VITE_API_URL || "/api";
+  const baseUrl = import.meta.env.VITE_API_URL || "";
   const token = getAuthToken();
   const response = await fetch(`${baseUrl}${path}`, {
     ...options,

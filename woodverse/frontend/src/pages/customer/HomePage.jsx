@@ -96,8 +96,8 @@ export function HomePage({ addToCart }) {
             <h1 className="mt-7 break-words text-5xl font-extrabold leading-[1.04] sm:text-6xl lg:text-7xl">Build better woodcraft, together.</h1>
             <p className="mt-6 max-w-xl break-words text-lg leading-relaxed text-emerald-50/80 sm:text-xl">WoodVerse brings customers, verified vendors, and trusted suppliers into one place, from the first product search to final delivery.</p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <button onClick={() => navigate("/shop")} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[#d8a36b] px-5 sm:min-h-[3.25rem] sm:px-6 font-extrabold text-[#17231f] shadow-xl transition hover:-translate-y-1 hover:bg-[#e4b57e]">Get it free <ArrowRight className="h-5 w-5" /></button>
-              <button onClick={() => scrollTo("#about")} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-white/25 bg-white/10 px-5 sm:min-h-[3.25rem] sm:px-6 font-extrabold text-white backdrop-blur transition hover:bg-white/15"><Play className="h-4 w-4 fill-current" /> Learn More</button>
+              <button onClick={() => navigate("/shop")} className="inline-flex min-h-14 items-center gap-3 rounded-xl bg-[#d8a36b] px-7 text-lg sm:min-h-16 sm:px-9 font-extrabold text-[#17231f] shadow-xl transition hover:-translate-y-1 hover:bg-[#e4b57e]">Get it free <ArrowRight className="h-6 w-6" /></button>
+              <button onClick={() => scrollTo("#about")} className="inline-flex min-h-14 items-center gap-3 rounded-xl border border-white/25 bg-white/10 px-7 text-lg sm:min-h-16 sm:px-9 font-extrabold text-white backdrop-blur transition hover:bg-white/15"><Play className="h-5 w-5 fill-current" /> Learn More</button>
             </div>
           </div>
           <div className="rounded-2xl border border-white/20 bg-white/10 p-3 shadow-2xl backdrop-blur-xl animate-[float_6s_ease-in-out_infinite]">

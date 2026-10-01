@@ -31,7 +31,45 @@ export function SupplierSidebar({ active, onUnavailable }) {
   const navItems = supplierNavItems;
 
   return (
-    <aside className="relative min-h-screen border-r border-[#5b513f] bg-[#332a1a] text-[#e3d8c8] lg:sticky lg:top-0 lg:h-screen">
+    <>
+    <nav className="flex items-center gap-2 overflow-x-auto border-b border-[#5b513f] bg-[#332a1a] px-3 py-3 text-[14px] font-extrabold lg:hidden" aria-label="Supplier navigation">
+      {navItems.map(([Icon, label, href]) => {
+        const selected = active === label;
+        return (
+          <button
+            key={label}
+            onClick={() => (href ? navigate(href) : onUnavailable?.(label))}
+            aria-current={selected ? "page" : undefined}
+            className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full px-4 transition ${
+              selected
+                ? "bg-[#00614d] text-white"
+                : "text-[#d8c9b5] hover:bg-[#2d2616] hover:text-[#6ff4db]"
+            }`}
+          >
+            <Icon className="h-4 w-4 shrink-0" strokeWidth={2.2} />
+            <span className="whitespace-nowrap">{t(label)}</span>
+          </button>
+        );
+      })}
+      <button onClick={() => navigate("/supplier/support")} className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full px-4 transition ${active === "Support" ? "bg-[#00614d] text-white" : "text-[#c8bba8] hover:bg-[#2d2616] hover:text-[#6ff4db]"}`}>
+        <CircleHelp className="h-4 w-4 shrink-0" strokeWidth={2.2} />
+        <span className="whitespace-nowrap">{t("Support")}</span>
+      </button>
+      <button onClick={() => navigate("/supplier/settings")} className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full px-4 transition ${active === "Settings" ? "bg-[#00614d] text-white" : "text-[#c8bba8] hover:bg-[#2d2616] hover:text-[#6ff4db]"}`}>
+        <Settings className="h-4 w-4 shrink-0" strokeWidth={2.2} />
+        <span className="whitespace-nowrap">{t("Settings")}</span>
+      </button>
+      <button onClick={() => navigate("/supplier/shipments/new")} className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full bg-[#00614d] px-4 text-white transition hover:bg-[#08715c]">
+        <Plus className="h-4 w-4 shrink-0" strokeWidth={2.2} />
+        <span className="whitespace-nowrap">{t("New Shipment")}</span>
+      </button>
+      <button onClick={signOut} className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full px-4 text-[#e8a3a3] transition hover:bg-[#2d2616] hover:text-[#ff9b9b]">
+        <LogOut className="h-4 w-4 shrink-0" strokeWidth={2.2} />
+        <span className="whitespace-nowrap">Log out</span>
+      </button>
+    </nav>
+
+    <aside className="relative hidden border-r border-[#5b513f] bg-[#332a1a] text-[#e3d8c8] lg:sticky lg:top-0 lg:block lg:h-screen">
       <div className="px-5 pb-8 pt-4">
         <button onClick={() => navigate("/supplier")} className="text-left">
           <BrandLogo
@@ -86,5 +124,6 @@ export function SupplierSidebar({ active, onUnavailable }) {
         </button>
       </div>
     </aside>
+    </>
   );
 }

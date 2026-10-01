@@ -387,9 +387,9 @@ describe("Portal sign out", () => {
       </BrowserRouter>
     );
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: label })).toBeInTheDocument();
+      expect(screen.getAllByRole("button", { name: label }).length).toBeGreaterThan(0);
     }, PORTAL_TIMEOUT);
-    await userEvent.click(screen.getByRole("button", { name: label }));
+    await userEvent.click(screen.getAllByRole("button", { name: label })[0]);
     await waitFor(() => {
       expect(window.location.pathname).toBe("/");
     });

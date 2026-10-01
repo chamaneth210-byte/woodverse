@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+scikit-learn
+opencv-python-headless
+numpy
+httpx
+psycopg[binary]
+psycopg-pool

@@ -1,0 +1,13 @@
+export { HomePage } from "./HomePage";
+export { CatalogPage } from "./CatalogPage";
+export { CategoryPage } from "./CatalogPage";
+export { CartPage } from "./CartPage";
+export { DeliveryPage } from "./DeliveryPage";
+export { PaymentPage } from "./PaymentPage";
+export { ProductDetailsPage } from "./ProductDetailsPage";
+export { ChatbotPage } from "./ChatbotPage";
+export { LoginPage } from "./LoginPage";
+export { ForgotPasswordPage } from "./ForgotPasswordPage";
+export { ProfilePage } from "./ProfilePage";
+export { SellerPage } from "./SellerPage";
+export { FeaturesPage } from "./FeaturesPage";

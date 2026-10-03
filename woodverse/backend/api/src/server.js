@@ -8,6 +8,7 @@ import rateLimit from "express-rate-limit";
 import { Server } from "socket.io";
 import { databaseConfigured, initializeDatabase } from "./db.js";
 import { registerRoutes } from "./routes/index.js";
+import { devCredentials } from "./routes/auth.js";
 import { registerSocketHandlers } from "./socket.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -61,6 +62,10 @@ initializeDatabase()
     server.listen(port, "0.0.0.0",() => {
       console.log(`WoodVerse Express API and Socket.IO server running on http://localhost:${port}`);
       console.log(`PostgreSQL database: ${databaseStatus}`);
+      if (!result.initialized && process.env.NODE_ENV !== "production") {
+        console.log("No database, so login falls back to seeded in-memory accounts:");
+        for (const account of devCredentials) console.log(`  ${account.email} / ${account.password}`);
+      }
     });
   })
   .catch((error) => {

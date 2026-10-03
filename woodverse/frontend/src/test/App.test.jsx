@@ -355,6 +355,57 @@ describe("Supplier portal routes", () => {
     });
     expect(screen.queryByText("Vendor Directory")).not.toBeInTheDocument();
   });
+
+  // Guards the whole sign-in to dashboard path: the guard must not bounce a supplier who
+  // has just authenticated. Note this asserts the flow, not the commit ordering that caused
+  // the original bounce. That ordering depends on how the browser batches the popstate
+  // dispatched inside navigate(), and jsdom commits both updates together, so the old
+  // guard passed here too. Keep this test as the flow check, not as proof of that race.
+  it("lands on the dashboard after signing in, without bouncing back to login", async () => {
+    clearAuth();
+    const encode = (value) => btoa(JSON.stringify(value)).replace(/=+$/, "");
+    const token = [
+      encode({ alg: "HS256", typ: "JWT" }),
+      encode({ id: "22222222-2222-4222-8222-222222222222", role: "supplier", email: "ops@lumbinitimber.lk", exp: Math.floor(Date.now() / 1000) + 3600 }),
+      "signature",
+    ].join(".");
+
+    // A fresh Response per call: a body can only be read once, and App also fetches
+    // /api/catalog on mount.
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const url = String(input);
+      if (url.includes("/api/auth/login")) {
+        return new Response(JSON.stringify({ token, user: { id: "22222222-2222-4222-8222-222222222222", role: "supplier", email: "ops@lumbinitimber.lk" } }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      return new Response(JSON.stringify({ products: [] }), { status: 200, headers: { "content-type": "application/json" } });
+    });
+
+    window.history.pushState({}, "Test page", "/login");
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    );
+    await waitFor(() => {
+      expect(screen.getByText("Welcome Back")).toBeInTheDocument();
+    });
+
+    await userEvent.type(screen.getByLabelText("Email Address"), "ops@lumbinitimber.lk");
+    // Exact, because the reveal toggle is labelled "Show password".
+    await userEvent.type(screen.getByLabelText("Password", { exact: true }), "Supplier@123");
+    await userEvent.click(screen.getByRole("button", { name: /sign in/i }));
+
+    await waitFor(() => {
+      expect(window.location.pathname).toBe("/supplier");
+    }, PORTAL_TIMEOUT);
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1, name: "Here's your operational overview for today, October 24th." })).toBeInTheDocument();
+    }, PORTAL_TIMEOUT);
+    expect(window.location.pathname).not.toContain("/login");
+  });
 });
 
 describe("Portal sign out", () => {

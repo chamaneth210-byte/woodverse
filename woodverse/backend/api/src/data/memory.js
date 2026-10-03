@@ -1,5 +1,22 @@
 export const orders = [];
 
+// One shared password for every in-memory account. These accounts exist so the role
+// gated portals can be opened without a database, and are only ever consulted when
+// DATABASE_URL is absent and NODE_ENV is not production. `devAccountsEnabled` in
+// routes/auth.js is the single place that decides this.
+export const devPassword = "WoodVerse@123";
+
+// bcrypt hash of devPassword, cost 10. Stored hashed rather than in plain text so the
+// login path runs the same comparison it runs for a real database account.
+const DEV_PASSWORD_HASH = "$2b$10$v5Nj9WrEoUAcuME1fFOiuuJn188X0yTv1u/gbbWSlik/Yix2T38ey";
+
+export const devAccounts = [
+  { id: "d3c4b5a6-1111-4111-8111-111111111111", email: "customer@woodverse.lk", full_name: "Nimali Perera", role: "customer", status: "active" },
+  { id: "d3c4b5a6-2222-4222-8222-222222222222", email: "vendor@woodverse.lk", full_name: "Kasun Fernando", role: "vendor", status: "active" },
+  { id: "d3c4b5a6-3333-4333-8333-333333333333", email: "supplier@woodverse.lk", full_name: "Lumbini Timber Co.", role: "supplier", status: "active" },
+  { id: "d3c4b5a6-4444-4444-8444-444444444444", email: "admin@woodverse.lk", full_name: "Site Administrator", role: "admin", status: "active" },
+].map((user) => ({ ...user, password_hash: DEV_PASSWORD_HASH }));
+
 export const catalogProducts = [
   { id: "royal-majesty-set", name: "Royal Majesty Set", vendor: "Moratuwa Crafts", stock: "In Stock", stockType: "in", quantityAvailable: 6 },
   { id: "heritage-sideboard", name: "Heritage Sideboard", vendor: "Ceylon Woods", stock: "Low Stock (2)", stockType: "low", quantityAvailable: 2 },

@@ -137,14 +137,23 @@ export default function App() {
 
   // Redirect in an effect so the guard cannot render the protected page for even a
   // frame before navigating away.
+  //
+  // The session is re-read here rather than taken from this render. Signing in stores the
+  // token and then navigates in the same tick, so the popstate that changes the path can be
+  // committed before the queued session update. Reading the render's `session` in that window
+  // saw a null session and bounced a user who had just signed in straight back to /login.
   useEffect(() => {
-    if (!isBlocked) return;
-    const reason = !session ? "signin" : "forbidden";
-    const target = reason === "signin" ? `/login?next=${encodeURIComponent(path)}` : "/";
+    const allowedRoles = pageRoles[resolvePage(path)];
+    if (!allowedRoles) return;
+
+    const currentSession = getSession();
+    if (currentSession && allowedRoles.includes(currentSession.role)) return;
+
+    const target = currentSession ? "/" : `/login?next=${encodeURIComponent(path)}`;
     if (window.location.pathname !== target) {
       navigate(target);
     }
-  }, [isBlocked, session, path]);
+  }, [session, path]);
 
   return (
     <div className={theme === "dark" ? "min-h-screen bg-[#191d1c] text-stone-100" : "min-h-screen bg-paper text-ink"}>

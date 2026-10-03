@@ -5,7 +5,7 @@
   "description": "WoodVerse - AI-assisted multi-vendor woodcraft platform",
   "workspaces": [
     "frontend",
-    "backend/*"
+    "backend/api"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\" \"npm run dev:ai\"",

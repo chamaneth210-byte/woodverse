@@ -1,2 +1,10 @@
+# Nixpacks pinned Node 18 here, but `npm start` runs
+# `node --env-file-if-exists=.env src/server.js` and that flag only exists from
+# Node 22.9.0 (--env-file landed in 20.6.0). On Node 18 the process exits
+# immediately with "bad option", so the container never binds a port and the
+# /api/health check fails every attempt.
+[phases.setup]
+nixPkgs = ["nodejs_22"]
+
 [deploy]
 startCommand = "node src/server.js"

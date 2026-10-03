@@ -52,12 +52,14 @@ export function getSession() {
     clearAuth();
     return null;
   }
+
   if (typeof claims.exp === "number" && claims.exp * 1000 <= Date.now()) {
     clearAuth();
     return null;
   }
 
   const user = getAuthUser();
+
   return {
     token,
     role: claims.role || user?.role || null,
@@ -105,9 +107,17 @@ export function signOut() {
 function decodeJwt(token) {
   const parts = String(token || "").split(".");
   if (parts.length !== 3) return null;
+
   try {
-    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=");
+    const base64 = parts[1]
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+
+    const padded = base64.padEnd(
+      base64.length + ((4 - (base64.length % 4)) % 4),
+      "="
+    );
+
     return JSON.parse(decodeURIComponent(escape(atob(padded))));
   } catch {
     return null;
@@ -115,8 +125,12 @@ function decodeJwt(token) {
 }
 
 export async function apiRequest(path, options = {}) {
+  // Uses VITE_API_URL in production (Vercel → Railway).
+  // If empty during local development, the Vite proxy handles /api requests.
   const baseUrl = import.meta.env.VITE_API_URL || "";
+
   const token = getAuthToken();
+
   const response = await fetch(`${baseUrl}${path}`, {
     ...options,
     headers: {
@@ -125,23 +139,30 @@ export async function apiRequest(path, options = {}) {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
   });
+
   if (!response.ok) {
     const text = await response.text();
+
     let message = `API request failed: ${response.status}`;
+
     try {
       const data = JSON.parse(text);
       message = data.error || message;
     } catch {
       message = text || message;
     }
+
     // An expired or rejected token must not linger, otherwise every later request
     // keeps failing and the UI keeps looking signed in.
     if (response.status === 401) {
       clearAuth();
       window.dispatchEvent(new CustomEvent("woodverse:unauthorized"));
     }
+
     throw new Error(message);
   }
+
   if (response.status === 204) return null;
+
   return response.json();
 }

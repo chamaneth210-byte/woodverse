@@ -1,4 +1,15 @@
-aptPkgs = ["libgl1", "libglib2.0-0"]
+# The Python interpreter and pip are pinned explicitly here rather than left to
+# provider auto-detection. Railpack classified this service as Node while a stray
+# package.json sat in this directory, and the build then ran a bare
+# `pip install -r requirements.txt` against an image with no Python, failing with
+# "sh: 1: pip: not found". Naming python3 and pip in the setup phase makes the
+# toolchain present no matter which provider is selected, so a stale or overridden
+# build command cannot fail on a missing pip again.
+#
+# libgl1 and libglib2.0-0 are the runtime libraries opencv-python-headless links
+# against.
+[phases.setup]
+nixPkgs = ["python3", "python3Packages.pip", "libgl1", "libglib2.0-0"]
 
 [deploy]
 startCommand = "uvicorn src.main:app --host 0.0.0.0 --port $PORT"

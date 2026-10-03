@@ -135,7 +135,7 @@ export function SupplierPurchaseOrderPage({ theme, onToggleTheme }) {
                   </div>
 
                   <div className="grid grid-cols-[96px_minmax(0,1fr)_130px_130px] gap-4 max-lg:grid-cols-2 max-sm:grid-cols-1">
-                    <img className="h-24 w-24 rounded-md border border-[#d8d7d0] object-cover dark:border-white/10" src="/assets/product-walnut-task-table.png" alt="Grade-A teak grain" />
+                    <img className="h-24 w-24 rounded-md border border-[#d8d7d0] object-cover dark:border-white/10" src="/assets/product-walnut-task-table.webp" alt="Grade-A teak grain" />
                     <div className="min-w-0">
                       <p className="text-xs font-extrabold uppercase tracking-wide text-[#4d5651] dark:text-stone-400">Wood Type & Grade</p>
                       <h3 className="mt-2 text-3xl font-extrabold leading-tight text-[#202621] dark:text-stone-100">Grade-A Teak</h3>

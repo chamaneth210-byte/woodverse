@@ -14,7 +14,7 @@ const mockProduct = {
   stockQuantity: 8,
   description: "A relaxed lounge chair combining a hardwood frame, cane back, and washable cushion seat.",
   tags: ["Cane", "Fabric"],
-  image: "/assets/living-room-hero.png",
+  image: "/assets/living-room-hero.webp",
   category: "furniture",
   room: "Living",
   featured: 14,

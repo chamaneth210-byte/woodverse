@@ -49,7 +49,7 @@ export function ChatbotPage() {
         </div>
         <form onSubmit={(event) => { event.preventDefault(); send(input); }} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 border-t border-slate-200 p-5 dark:border-slate-700"><input value={input} onChange={(event) => setInput(event.target.value)} className="min-w-0 rounded-lg bg-blue-50 px-4 outline-none dark:bg-[#1d2422]" placeholder="Type your message..." /><button type="submit" disabled={isThinking} aria-label="Send message" className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-forest text-white disabled:cursor-not-allowed disabled:bg-slate-400"><Send className="h-5 w-5" /></button></form>
       </section>
-      <aside className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-[#202624] max-lg:hidden"><h2 className="text-xl font-bold">Active Order</h2><div className="mt-5 overflow-hidden rounded-lg"><CroppedImage crop={crop.bed} src="/assets/bedroom-soft-neutral.png" label="Active order" className="h-40" /></div><button onClick={() => navigate("/cart")} className="mt-6 w-full rounded-md bg-forest py-3 font-bold text-white">Open Cart</button></aside>
+      <aside className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-[#202624] max-lg:hidden"><h2 className="text-xl font-bold">Active Order</h2><div className="mt-5 overflow-hidden rounded-lg"><CroppedImage crop={crop.bed} src="/assets/bedroom-soft-neutral.webp" label="Active order" className="h-40" /></div><button onClick={() => navigate("/cart")} className="mt-6 w-full rounded-md bg-forest py-3 font-bold text-white">Open Cart</button></aside>
     </main>
   );
 }

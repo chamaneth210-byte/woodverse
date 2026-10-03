@@ -275,7 +275,7 @@ export function AuthShell({ children }) {
       <section className="grid w-full max-w-[1150px] grid-cols-[minmax(360px,520px)_minmax(0,1fr)] overflow-hidden rounded-xl border border-[#e4e1da] bg-white shadow-[0_2px_10px_rgba(32,30,25,0.14)] max-lg:max-w-[620px] max-lg:grid-cols-1">
         {children}
         <aside className="relative min-h-[760px] overflow-hidden bg-[#203b31] max-lg:hidden">
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,27,22,0.04),rgba(10,27,22,0.58)),url('/assets/auth-plant-table.png')] bg-cover bg-center" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,27,22,0.04),rgba(10,27,22,0.58)),url('/assets/auth-plant-table.webp')] bg-cover bg-center" />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(12,41,32,0.1),rgba(12,41,32,0.32))]" />
           <article className="absolute bottom-6 left-6 right-6 grid grid-cols-[minmax(0,1fr)_80px] gap-6 rounded-xl bg-white/90 p-6 shadow-xl backdrop-blur max-xl:grid-cols-1">
             <div className="min-w-0">

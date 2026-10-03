@@ -791,7 +791,7 @@ export function AdminDashboardPage() {
     <main className="min-h-screen bg-[#f8f4ec] text-[#202621]">
       <header className="sticky top-0 z-20 grid min-h-20 gap-3 border-b border-[#d8d4cc] bg-white/95 px-5 py-3 backdrop-blur lg:grid-cols-[260px_minmax(0,1fr)_auto] lg:items-center">
         <div className="flex items-center gap-3">
-          <span className="h-10 w-10 shrink-0 rounded-lg bg-[#102f27] bg-no-repeat" style={{ backgroundImage: "url('/assets/admin-vendor-logo.png')", backgroundSize: "500% auto", backgroundPosition: "25% 35%" }} aria-hidden="true" />
+          <span className="h-10 w-10 shrink-0 rounded-lg bg-[#102f27] bg-no-repeat" style={{ backgroundImage: "url('/assets/admin-vendor-logo.webp')", backgroundSize: "500% auto", backgroundPosition: "25% 35%" }} aria-hidden="true" />
           <strong className="text-lg text-[#104d3f]">WoodVerse Admin</strong>
         </div>
         <label className="flex min-h-11 max-w-[520px] items-center rounded-full bg-[#f0ebe3] px-4 text-[#66716b]">

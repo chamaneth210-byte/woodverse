@@ -202,7 +202,7 @@ export function VendorProfilePage() {
                   Manage the business identity shown to customers, admin, suppliers, and internal vendor tools.
                 </p>
               </div>
-              <button onClick={() => navigate("/vendor/settings")} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#c4cbc7] bg-white px-4 text-sm font-extrabold text-[#3d4541]">
+              <button onClick={() => navigate("/vendor/settings")} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-[#c4cbc7] bg-white px-3 text-sm font-extrabold text-[#3d4541]">
                 <Settings className="h-4 w-4" />
                 Open Settings
               </button>
@@ -242,15 +242,15 @@ export function VendorProfilePage() {
                 </SettingsPanel>
 
                 <div className="flex flex-wrap gap-3">
-                  <button type="submit" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#115745] px-4 text-sm font-extrabold text-white">
+                  <button type="submit" className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-[#115745] px-3 text-sm font-extrabold text-white">
                     <Save className="h-4 w-4" />
                     Save Profile
                   </button>
-                  <button type="button" onClick={exportProfile} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#c4cbc7] bg-white px-4 text-sm font-extrabold text-[#3d4541]">
+                  <button type="button" onClick={exportProfile} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-[#c4cbc7] bg-white px-3 text-sm font-extrabold text-[#3d4541]">
                     <Download className="h-4 w-4" />
                     Export Profile
                   </button>
-                  <button type="button" onClick={resetProfile} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#e9e4dc] px-4 text-sm font-extrabold text-[#3d4541]">
+                  <button type="button" onClick={resetProfile} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-[#e9e4dc] px-3 text-sm font-extrabold text-[#3d4541]">
                     <RotateCcw className="h-4 w-4" />
                     Reset
                   </button>
@@ -285,11 +285,11 @@ export function VendorProfilePage() {
                     <SettingsToggle title="Accept custom orders" detail="Allow customers to request bespoke furniture." checked={profile.acceptCustomOrders} onChange={() => toggleProfileSetting("acceptCustomOrders", "Custom orders")} compact />
                     <SettingsToggle title="Show phone number" detail="Display phone on customer-facing profile." checked={profile.showPhone} onChange={() => toggleProfileSetting("showPhone", "Phone visibility")} compact />
                     <SettingsToggle title="Show email" detail="Display email on customer-facing profile." checked={profile.showEmail} onChange={() => toggleProfileSetting("showEmail", "Email visibility")} compact />
-                    <button type="button" onClick={requestVerification} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#115745] px-4 text-sm font-extrabold text-white">
+                    <button type="button" onClick={requestVerification} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-[#115745] px-3 text-sm font-extrabold text-white">
                       <CheckCircle2 className="h-4 w-4" />
                       Request Verification
                     </button>
-                    <button type="button" onClick={copyPublicLink} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#c4cbc7] bg-white px-4 text-sm font-extrabold text-[#3d4541]">
+                    <button type="button" onClick={copyPublicLink} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-[#c4cbc7] bg-white px-3 text-sm font-extrabold text-[#3d4541]">
                       <Globe2 className="h-4 w-4" />
                       Copy Public Link
                     </button>

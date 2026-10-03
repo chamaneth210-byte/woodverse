@@ -1,7 +1,8 @@
 import { apiRequest, navigate } from "../../utils";
+import { dropStaleAssetCaches } from "../../lib/storage";
 import { formatOrderDate, getInitialsFromName, normalizeMatchText } from "./format.js";
 import { initialOrders, initialProductionWorks, initialVendorProducts, supplierMaterialStock, vendorSupplierDirectory } from "./seed.js";
-import { vendorAdminNotificationsStorageKey, vendorOpenNewOrderStorageKey, vendorOrdersStorageKey, vendorProductionStorageKey } from "./storageKeys.js";
+import { vendorAdminNotificationsStorageKey, vendorOpenNewOrderStorageKey, vendorOrdersStorageKey, vendorProductsStorageKey, vendorProductionStorageKey } from "./storageKeys.js";
 
 export function getStoredVendorOrders() {
   try {
@@ -37,8 +38,9 @@ export function getNextStoredVendorOrderId() {
 }
 
 export function getStoredVendorProducts() {
+  dropStaleAssetCaches([vendorProductsStorageKey]);
   try {
-    return JSON.parse(localStorage.getItem("woodverse-vendor-products") || "null") || initialVendorProducts;
+    return JSON.parse(localStorage.getItem(vendorProductsStorageKey) || "null") || initialVendorProducts;
   } catch {
     return initialVendorProducts;
   }

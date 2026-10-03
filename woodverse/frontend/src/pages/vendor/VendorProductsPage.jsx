@@ -8,6 +8,7 @@ import {
   Search,
 } from "lucide-react";
 import { publishAdminEvent } from "../../lib/adminEvents";
+import { dropStaleAssetCaches } from "../../lib/storage";
 import { VendorHeader } from "./VendorHeader";
 import { VendorSidebar } from "./VendorSidebar";
 import { normalizeLkrPrice, parseOrderAmount } from "./format.js";
@@ -15,12 +16,14 @@ import { ProductStat } from "./orderParts";
 import { requestVendorNewOrder } from "./orders.js";
 import { initialVendorProducts } from "./seed.js";
 import { ModalShell, SettingsInput, SettingsSelect } from "./shared";
+import { vendorProductsStorageKey } from "./storageKeys.js";
 
 export function VendorProductsPage() {
   const [notice, setNotice] = useState("Products loaded.");
   const [products, setProducts] = useState(() => {
+    dropStaleAssetCaches([vendorProductsStorageKey]);
     try {
-      return JSON.parse(localStorage.getItem("woodverse-vendor-products") || "null") || initialVendorProducts;
+      return JSON.parse(localStorage.getItem(vendorProductsStorageKey) || "null") || initialVendorProducts;
     } catch {
       return initialVendorProducts;
     }
@@ -40,7 +43,7 @@ export function VendorProductsPage() {
 
   useEffect(() => {
     try {
-      localStorage.setItem("woodverse-vendor-products", JSON.stringify(products));
+      localStorage.setItem(vendorProductsStorageKey, JSON.stringify(products));
     } catch {}
   }, [products]);
 
@@ -208,7 +211,7 @@ export function ProductFormModal({ product, onClose, onSubmit }) {
     price: product?.price || "",
     stock: product?.stock ?? 1,
     status: product?.status || "Draft",
-    image: product?.image || "/assets/workspace-desk-neutral.png",
+    image: product?.image || "/assets/workspace-desk-neutral.webp",
   });
   const [error, setError] = useState("");
 
@@ -255,7 +258,7 @@ export function ProductFormModal({ product, onClose, onSubmit }) {
             <SettingsInput label="Price" value={form.price} onChange={(value) => updateField("price", value)} />
             <SettingsInput label="Stock" type="number" value={form.stock} onChange={(value) => updateField("stock", value)} />
           </div>
-          <SettingsSelect label="Image" value={form.image} options={["/assets/workspace-desk-neutral.png", "/assets/product-walnut-task-table.png", "/assets/royal-majesty-sofa-set.png", "/assets/signature-bedframe.png", "/assets/product-carved-gift-box.png", "/assets/product-modular-shelf-unit.png"]} onChange={(value) => updateField("image", value)} />
+          <SettingsSelect label="Image" value={form.image} options={["/assets/workspace-desk-neutral.webp", "/assets/product-walnut-task-table.webp", "/assets/royal-majesty-sofa-set.webp", "/assets/signature-bedframe.webp", "/assets/product-carved-gift-box.webp", "/assets/product-modular-shelf-unit.webp"]} onChange={(value) => updateField("image", value)} />
           <SettingsSelect label="Status" value={form.status} options={["Draft", "Published", "Archived"]} onChange={(value) => updateField("status", value)} />
         </div>
         <div className="sticky bottom-0 flex flex-wrap justify-end gap-3 border-t border-[#d9d5cd] bg-white px-5 py-4 sm:px-6">

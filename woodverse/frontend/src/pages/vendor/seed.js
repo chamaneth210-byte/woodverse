@@ -22,7 +22,7 @@ export const initialVendorProducts = [
     price: "LKR 145,000",
     stock: 18,
     status: "Published",
-    image: "/assets/product-walnut-task-table.png",
+    image: "/assets/product-walnut-task-table.webp",
   },
   {
     id: "VP-1002",
@@ -32,7 +32,7 @@ export const initialVendorProducts = [
     price: "LKR 485,000",
     stock: 7,
     status: "Published",
-    image: "/assets/royal-majesty-sofa-set.png",
+    image: "/assets/royal-majesty-sofa-set.webp",
   },
   {
     id: "VP-1003",
@@ -42,7 +42,7 @@ export const initialVendorProducts = [
     price: "LKR 265,000",
     stock: 11,
     status: "Draft",
-    image: "/assets/signature-bedframe.png",
+    image: "/assets/signature-bedframe.webp",
   },
   {
     id: "VP-1004",
@@ -52,7 +52,7 @@ export const initialVendorProducts = [
     price: "LKR 14,500",
     stock: 32,
     status: "Published",
-    image: "/assets/product-carved-gift-box.png",
+    image: "/assets/product-carved-gift-box.webp",
   },
 ];
 

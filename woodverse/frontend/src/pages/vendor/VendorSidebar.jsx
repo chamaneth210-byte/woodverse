@@ -19,7 +19,7 @@ export function VendorSidebar({ active = "Dashboard", onNavigate, onNewOrder }) 
     <>
       <aside className="hidden border-r border-[#d8d2c7] bg-[#f3eee6] px-4 py-6 lg:sticky lg:top-0 lg:block lg:h-screen">
         <button onClick={() => onNavigate("Vendor dashboard opened.")} className="mb-7 flex items-center gap-3 px-3 text-left">
-          <span className="h-10 w-10 shrink-0 rounded-lg bg-[#102f27] bg-no-repeat" style={{ backgroundImage: "url('/assets/admin-vendor-logo.png')", backgroundSize: "500% auto", backgroundPosition: "25% 35%" }} aria-hidden="true" />
+          <span className="h-10 w-10 shrink-0 rounded-lg bg-[#102f27] bg-no-repeat" style={{ backgroundImage: "url('/assets/admin-vendor-logo.webp')", backgroundSize: "500% auto", backgroundPosition: "25% 35%" }} aria-hidden="true" />
           <span><strong className="block text-xl font-extrabold text-[#115745]">WoodVerse</strong>
           <span className="text-sm font-semibold text-[#777b76]">Vendor Portal</span>
           </span>

@@ -58,7 +58,7 @@ export function CategoryPage({ type, items: catalogItems = [], addToCart }) {
           <p className="mt-5 max-w-2xl break-words text-lg leading-relaxed text-slate-600 dark:text-stone-300">{subtitle}</p>
         </div>
         <div className="overflow-hidden rounded-[72px_72px_36px_36px] shadow-soft dark:shadow-dark">
-          <div className="h-[clamp(240px,52vw,350px)]"><CroppedImage src={gift ? "/assets/site-hero.png" : "/assets/furniture-hero.png"} label={title} /></div>
+          <div className="h-[clamp(240px,52vw,350px)]"><CroppedImage src={gift ? "/assets/site-hero.webp" : "/assets/furniture-hero.webp"} label={title} /></div>
         </div>
       </section>
       <section className="page-shell grid grid-cols-2 gap-5 pb-8 lg:grid-cols-4 max-sm:grid-cols-1">

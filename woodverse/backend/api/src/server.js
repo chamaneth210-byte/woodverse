@@ -6,7 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import rateLimit from "express-rate-limit";
 import { Server } from "socket.io";
-import { databaseConfigured, initializeDatabase } from "./db.js";
+import { initializeDatabase } from "./db.js";
 import { registerRoutes } from "./routes/index.js";
 import { devCredentials } from "./routes/auth.js";
 import { registerSocketHandlers } from "./socket.js";
@@ -23,6 +23,8 @@ const configuredOrigins = (
   .map((origin) => origin.trim())
   .filter(Boolean);
 
+console.log("[CORS] Configured origins:", configuredOrigins);
+
 if (!process.env.JWT_SECRET) {
   console.warn(
     "JWT_SECRET is not set. Using a fallback secret. Set JWT_SECRET in production."
@@ -33,28 +35,46 @@ const app = express();
 
 app.use(helmet());
 
-/*
- * CORS
- * Allows the configured frontend origins.
- */
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests that do not contain an Origin header
-      // such as curl/server-to-server requests.
+      console.log("[CORS] Request origin:", origin);
+
+      // Allow requests without an Origin header
       if (!origin) {
         return callback(null, true);
       }
 
+      // Allow configured origins
       if (configuredOrigins.includes(origin)) {
         return callback(null, true);
       }
 
+      // Allow the production Vercel frontend
+      if (origin === "https://woodverse-rvrd.vercel.app") {
+        return callback(null, true);
+      }
+
+      console.warn("[CORS] Rejected origin:", origin);
+
       return callback(new Error("Not allowed by CORS"));
     },
+
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS",
+    ],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
   })
 );
 
@@ -81,7 +101,15 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: configuredOrigins,
+    origin: configuredOrigins.includes(
+      "https://woodverse-rvrd.vercel.app"
+    )
+      ? configuredOrigins
+      : [
+          ...configuredOrigins,
+          "https://woodverse-rvrd.vercel.app",
+        ],
+
     methods: ["GET", "POST"],
   },
 });
@@ -108,7 +136,9 @@ if (process.env.NODE_ENV === "production") {
       });
     }
 
-    response.sendFile(path.join(frontendDistPath, "index.html"));
+    response.sendFile(
+      path.join(frontendDistPath, "index.html")
+    );
   });
 }
 
@@ -123,7 +153,9 @@ initializeDatabase()
         `WoodVerse Express API and Socket.IO server running on http://localhost:${port}`
       );
 
-      console.log(`PostgreSQL database: ${databaseStatus}`);
+      console.log(
+        `PostgreSQL database: ${databaseStatus}`
+      );
 
       if (
         !result.initialized &&
@@ -134,12 +166,18 @@ initializeDatabase()
         );
 
         for (const account of devCredentials) {
-          console.log(`  ${account.email} / ${account.password}`);
+          console.log(
+            `  ${account.email} / ${account.password}`
+          );
         }
       }
     });
   })
   .catch((error) => {
-    console.error("Failed to initialize database:", error);
+    console.error(
+      "Failed to initialize database:",
+      error
+    );
+
     process.exit(1);
   });

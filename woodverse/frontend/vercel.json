@@ -9,8 +9,9 @@
       "destination": "https://woodverse-api-production.up.railway.app/socket.io/:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!assets/).*)",
       "destination": "/index.html"
     }
   ]
 }
+

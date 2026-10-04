@@ -56,7 +56,7 @@ export const customerSeed = [
 ];
 
 export const vendorSeed = [
-  { id: "VEN-0184", name: "Perera Artisan Works", email: "aruni@pereraartisan.lk", location: "Moratuwa", status: "Verified", orders: 42, value: "LKR 2.8M", joined: "Jun 02, 2026" },
+  { id: "VEN-0184", name: "Kasun Fernando Woodcraft", email: "vendor@woodverse.lk", location: "Moratuwa", status: "Verified", orders: 42, value: "LKR 2.8M", joined: "Jun 02, 2026" },
   { id: "VEN-0183", name: "Heritage Furnishings", email: "legal@heritage.lk", location: "Nugegoda", status: "Pending", orders: 12, value: "LKR 740,000", joined: "Jul 21, 2026" },
   { id: "VEN-0182", name: "Arpico Woodworks", email: "arpico.wood@example.com", location: "Ratmalana", status: "Review", orders: 0, value: "LKR 0", joined: "Jul 24, 2026" },
 ];
@@ -68,17 +68,17 @@ export const supplierSeed = [
 ];
 
 export const productSeed = [
-  { id: "PRD-1240", name: "Walnut Task Table", vendor: "Perera Artisan Works", category: "Office Furniture", price: "LKR 145,000", stock: 18, status: "Published", featured: true, sales: 32, submitted: "Jul 22, 2026" },
+  { id: "PRD-1240", name: "Walnut Task Table", vendor: "Kasun Fernando Woodcraft", category: "Office Furniture", price: "LKR 145,000", stock: 18, status: "Published", featured: true, sales: 32, submitted: "Jul 22, 2026" },
   { id: "PRD-1239", name: "Teak Dining Table", vendor: "Heritage Furnishings", category: "Dining Room", price: "LKR 285,000", stock: 6, status: "Pending Review", featured: false, sales: 0, submitted: "Jul 25, 2026" },
   { id: "PRD-1238", name: "Mahogany Coffee Table", vendor: "Arpico Woodworks", category: "Living Room", price: "LKR 89,000", stock: 0, status: "Stock Hold", featured: false, sales: 14, submitted: "Jul 18, 2026" },
-  { id: "PRD-1237", name: "Carved Gift Box", vendor: "Perera Artisan Works", category: "Wooden Gifts", price: "LKR 18,500", stock: 42, status: "Published", featured: true, sales: 58, submitted: "Jul 12, 2026" },
+  { id: "PRD-1237", name: "Carved Gift Box", vendor: "Kasun Fernando Woodcraft", category: "Wooden Gifts", price: "LKR 18,500", stock: 42, status: "Published", featured: true, sales: 58, submitted: "Jul 12, 2026" },
 ];
 
 export const orderSeed = [
-  { id: "ORD-5524", customer: "Kasun Wijesinghe", vendor: "Perera Artisan Works", product: "Walnut Task Table", amount: "LKR 145,000", payment: "Paid", fulfillment: "Customer Delivery", status: "Completed", date: "Jul 30, 2026", priority: "Normal" },
+  { id: "ORD-5524", customer: "Kasun Wijesinghe", vendor: "Kasun Fernando Woodcraft", product: "Walnut Task Table", amount: "LKR 145,000", payment: "Paid", fulfillment: "Customer Delivery", status: "Completed", date: "Jul 30, 2026", priority: "Normal" },
   { id: "ORD-5523", customer: "Shani De Silva", vendor: "Heritage Furnishings", product: "Teak Dining Table", amount: "LKR 285,000", payment: "Authorized", fulfillment: "Production", status: "Processing", date: "Jul 29, 2026", priority: "High" },
   { id: "ORD-5522", customer: "Ranil Thilak", vendor: "Arpico Woodworks", product: "Mahogany Coffee Table", amount: "LKR 89,000", payment: "Pending", fulfillment: "Vendor Approval", status: "Vendor Approval", date: "Jul 28, 2026", priority: "High" },
-  { id: "ORD-5521", customer: "Amara Jayawardena", vendor: "Perera Artisan Works", product: "Carved Gift Box", amount: "LKR 18,500", payment: "Refund Requested", fulfillment: "Customer Delivery", status: "Refund Review", date: "Jul 27, 2026", priority: "Urgent" },
+  { id: "ORD-5521", customer: "Amara Jayawardena", vendor: "Kasun Fernando Woodcraft", product: "Carved Gift Box", amount: "LKR 18,500", payment: "Refund Requested", fulfillment: "Customer Delivery", status: "Refund Review", date: "Jul 27, 2026", priority: "Urgent" },
 ];
 
 export const categorySeed = [
@@ -90,10 +90,10 @@ export const categorySeed = [
 ];
 
 export const paymentSeed = [
-  { id: "PAY-8824", orderId: "ORD-5524", customer: "Kasun Wijesinghe", vendor: "Perera Artisan Works", amount: "LKR 145,000", method: "Card", status: "Settled", payout: "Released", date: "Jul 30, 2026", risk: "Low" },
+  { id: "PAY-8824", orderId: "ORD-5524", customer: "Kasun Wijesinghe", vendor: "Kasun Fernando Woodcraft", amount: "LKR 145,000", method: "Card", status: "Settled", payout: "Released", date: "Jul 30, 2026", risk: "Low" },
   { id: "PAY-8823", orderId: "ORD-5523", customer: "Shani De Silva", vendor: "Heritage Furnishings", amount: "LKR 285,000", method: "Bank Transfer", status: "Authorized", payout: "Hold", date: "Jul 29, 2026", risk: "Medium" },
   { id: "PAY-8822", orderId: "ORD-5522", customer: "Ranil Thilak", vendor: "Arpico Woodworks", amount: "LKR 89,000", method: "Card", status: "Pending", payout: "Not Ready", date: "Jul 28, 2026", risk: "Low" },
-  { id: "PAY-8821", orderId: "ORD-5521", customer: "Amara Jayawardena", vendor: "Perera Artisan Works", amount: "LKR 18,500", method: "Card", status: "Refund Requested", payout: "Blocked", date: "Jul 27, 2026", risk: "High" },
+  { id: "PAY-8821", orderId: "ORD-5521", customer: "Amara Jayawardena", vendor: "Kasun Fernando Woodcraft", amount: "LKR 18,500", method: "Card", status: "Refund Requested", payout: "Blocked", date: "Jul 27, 2026", risk: "High" },
 ];
 
 export const systemSettingsSeed = {

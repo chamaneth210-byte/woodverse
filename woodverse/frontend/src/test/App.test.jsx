@@ -427,7 +427,25 @@ describe("Portal sign out", () => {
     storeAuth({ token, user: { id: "44444444-4444-4444-8444-444444444444", role } });
   };
 
-  beforeEach(() => clearAuth());
+  beforeEach(() => {
+    clearAuth();
+    // The vendor header resolves the signed-in vendor's business name from
+    // GET /api/vendors on mount. Without a mock that becomes a real network
+    // call to a relative URL, which jsdom cannot satisfy and the test hangs on.
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const url = String(input);
+      if (url.includes("/api/vendors")) {
+        return new Response(JSON.stringify({ vendors: [] }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      return new Response(JSON.stringify({ products: [], vendors: [] }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    });
+  });
 
   it.each(portals)("signs out from %s", async (path, role, label) => {
     signIn(role);

@@ -17,14 +17,16 @@ import {
 } from "lucide-react";
 import { VendorHeader } from "./VendorHeader";
 import { VendorSidebar } from "./VendorSidebar";
+import { getVendorIdentity } from "./identity.js";
 import { requestVendorNewOrder } from "./orders.js";
 import { SettingsInput, SettingsSelect } from "./shared";
 
 export function VendorSettingsPage() {
+  const identity = getVendorIdentity();
   const defaultSettings = {
-    businessName: "Perera Artisan Works",
-    contactName: "Aruni Perera",
-    email: "aruni@pereraartisan.lk",
+    businessName: identity.businessName,
+    contactName: identity.ownerName,
+    email: identity.email,
     phone: "+94 77 412 8890",
     language: "English",
     timezone: "Asia/Colombo",

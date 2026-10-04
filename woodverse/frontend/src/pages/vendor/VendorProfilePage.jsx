@@ -16,25 +16,27 @@ import { VendorHeader } from "./VendorHeader";
 import { SettingsPanel, SettingsToggle } from "./VendorSettingsPage";
 import { VendorSidebar } from "./VendorSidebar";
 import { getInitials } from "./format.js";
+import { getVendorIdentity } from "./identity.js";
 import { requestVendorNewOrder } from "./orders.js";
 import { SettingsInput, SettingsSelect } from "./shared";
 
 export function VendorProfilePage() {
+  const identity = getVendorIdentity();
   const defaultProfile = {
-    businessName: "Perera Artisan Works",
-    ownerName: "Aruni Perera",
-    role: "Master Artisan",
-    email: "aruni@pereraartisan.lk",
+    businessName: identity.businessName,
+    ownerName: identity.ownerName,
+    role: identity.verificationStatus === "approved" ? "Verified Vendor" : "Pending Verification",
+    email: identity.email,
     phone: "+94 77 412 8890",
     location: "Moratuwa, Sri Lanka",
     workshopAddress: "42 Timber Craft Lane, Moratuwa",
     businessType: "Furniture Manufacturer",
     taxId: "VAT-LK-104882",
-    publicSlug: "perera-artisan-works",
+    publicSlug: identity.businessName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
     yearsActive: "12",
     teamSize: "24",
     specialty: "Custom teak, walnut, and mahogany furniture",
-    bio: "Verified Sri Lankan woodcraft vendor specializing in bespoke home and office furniture.",
+    bio: identity.description || "Verified Sri Lankan woodcraft vendor specializing in bespoke home and office furniture.",
     publicProfile: true,
     acceptCustomOrders: true,
     showPhone: true,

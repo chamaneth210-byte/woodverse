@@ -264,7 +264,7 @@ export function AdminDashboardPage() {
     const product = {
       id: `PRD-${Date.now().toString().slice(-4)}`,
       name: "New WoodVerse Product",
-      vendor: "Perera Artisan Works",
+      vendor: "Kasun Fernando Woodcraft",
       category: "Furniture",
       price: "LKR 0",
       stock: 0,
@@ -335,7 +335,7 @@ export function AdminDashboardPage() {
     const order = {
       id: `ORD-${Date.now().toString().slice(-4)}`,
       customer: "New Customer",
-      vendor: "Perera Artisan Works",
+      vendor: "Kasun Fernando Woodcraft",
       product: "New Product Order",
       amount: "LKR 0",
       payment: "Pending",
@@ -448,7 +448,7 @@ export function AdminDashboardPage() {
       id: `PAY-${Date.now().toString().slice(-4)}`,
       orderId: "ORD-New",
       customer: "New Customer",
-      vendor: "Perera Artisan Works",
+      vendor: "Kasun Fernando Woodcraft",
       amount: "LKR 0",
       method: "Card",
       status: "Pending",

@@ -11,6 +11,7 @@ import {
   Send,
 } from "lucide-react";
 import { VendorHeader } from "./VendorHeader";
+import { getVendorIdentity } from "./identity.js";
 import { SettingsPanel } from "./VendorSettingsPage";
 import { VendorSidebar } from "./VendorSidebar";
 import { requestVendorNewOrder } from "./orders.js";
@@ -80,7 +81,8 @@ export function VendorHelpCenterPage() {
 
   const submitEmailAdmin = (form) => {
     const subject = form.subject || "Vendor portal support request";
-    const body = `${form.message}\n\nVendor: Perera Artisan Works\nContact: Aruni Perera\nCategory: ${form.category}`;
+    const { businessName, ownerName } = getVendorIdentity();
+    const body = `${form.message}\n\nVendor: ${businessName}\nContact: ${ownerName}\nCategory: ${form.category}`;
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent("admin@woodverse.lk")}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(gmailUrl, "_blank", "noopener,noreferrer");
     const nextId = addSupportRecord({ subject, type: form.category, priority: "Medium", message: form.message, status: "Gmail Draft" });

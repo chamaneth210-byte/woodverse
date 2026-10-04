@@ -39,7 +39,7 @@ cd frontend && npx vite --host 127.0.0.1 --port 5173
 |---|---|---|
 | 1 | **Open `http://localhost:5173` — not `127.0.0.1:5173`.** | They are different origins to the browser, so `localStorage` is separate. A token saved under `localhost` is invisible at `127.0.0.1` and you appear logged out with no error. (The API's CORS allowlist also lists only `localhost:5173`/`5174`, which matters if you call the API directly from the console.) |
 | 2 | **Never run `npm test`, `npm run test:api` or `test:ai` while the demo DB is live.** | Those suites `TRUNCATE users, orders, vendors`. You will delete your own demo data minutes before you need it. |
-| 3 | **Re-seed only if you must:** `psql -h /var/run/postgresql -p 5433 -d woodverse_test -f database/seed.sql` | Gives you 4 accounts, 2 vendors, 9 published products. Idempotent, safe to re-run. |
+| 3 | **Reset the DB only if you must:** `./scripts/reset-demo-db.sh` | Restores exactly 4 accounts, 2 vendors, 9 products, 0 orders. Prefer this over a bare re-seed: `seed.sql` only *adds* rows, so fixtures left by `npm run test:api` (`a@example.com`, `b@example.com`, `vendor@example.com`, a "Lanka Teak Estates" vendor) survive it and show up in the admin console on stage. |
 | 4 | **Only type the exact chatbot lines in §3.2.** | Measured intent accuracy is **61 %**. Off-script phrasings fail visibly, in front of the panel. |
 | 5 | **Do not claim the image features have a UI.** | They have no UI and no proxy route. See §5. |
 
@@ -256,7 +256,7 @@ Switch to the vendor window → `/vendor/quotations` → click **Create Quotatio
 | "database not configured" | Terminal 1 started without `DATABASE_URL` | Restart API with `.env` loaded |
 | Login succeeds then bounces to `/` | Stale token in `localStorage` under `woodverse-auth-token` | Sign out, or clear that key and reload |
 | No notification on new order | Vendor window not open / socket disconnected | Reload vendor window, confirm socket connects |
-| Catalogue empty | Tests were run against this DB | Re-seed: `psql -h /var/run/postgresql -p 5433 -d woodverse_test -f database/seed.sql` |
+| Catalogue empty, or stray `*.example.com` rows in the admin console | Tests were run against this DB | `./scripts/reset-demo-db.sh` |
 | **HTTP 429 / "Too many authentication attempts"** | Rate limit: 20 logins or 100 API calls per 15 min | **Restart the API process** — clears the in-memory counters instantly. See §1.3a |
 | Logged out unexpectedly mid-demo | Rate limiter or an expired token | Restart the API, then sign in again |
 
@@ -310,6 +310,9 @@ This is the vendor behind `vendor@woodverse.lk`, and **all 9 published products 
 | User id | `06f0186b-c269-49ad-a261-059f8e96aaae` |
 | Verification status | `approved` (so the portal opens without admin gating) |
 | Account status | `active` |
+| Where the name comes from | `GET /api/vendors`, matched on the owner id in the JWT — not hard-coded |
+
+The vendor portal used to show **"Perera Artisan Works"** here while the API and the chatbot reported "Kasun Fernando Woodcraft" for the very same account. The name was a literal inside the page components. It is now resolved once in `frontend/src/pages/vendor/identity.js` and shared by every portal screen, so the header, profile, settings, purchase orders, supplier requests and support emails can no longer disagree with the backend.
 
 **Its catalogue — note the stock levels, because two rows make the demo better:**
 
@@ -366,6 +369,5 @@ THE VENDOR IN EVERY DEMO
   Royal Majesty Sofa Set has only 3 left → order 9 to force manufacturing
   Carved Wood Serving Tray = safest item to add to cart on stage
 
-SEED IF DATABASE LOOKS EMPTY
-  psql -h /var/run/postgresql -p 5433 -d woodverse_test -f database/seed.sql
+RESET DB IF IT LOOKS WRONG  ./scripts/reset-demo-db.sh
 ```

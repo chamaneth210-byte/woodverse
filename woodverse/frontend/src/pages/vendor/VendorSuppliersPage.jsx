@@ -10,6 +10,7 @@ import {
   appendStoredList,
 } from "../../lib/storage";
 import { VendorHeader } from "./VendorHeader";
+import { getVendorIdentity } from "./identity.js";
 import { VendorSidebar } from "./VendorSidebar";
 import { getMaterialStockDecision } from "./inventory.js";
 import { ProductStat } from "./orderParts";
@@ -86,7 +87,7 @@ export function VendorSuppliersPage() {
       linkedWork,
       status: "Requested",
       dueDate: getFutureDateLabel(5),
-      vendor: "Perera Artisan Works",
+      vendor: getVendorIdentity().businessName,
       sentAt: "Just now",
     };
     const supplierRequest = {

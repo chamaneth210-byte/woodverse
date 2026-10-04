@@ -11,7 +11,7 @@ import {
   Plus,
   UserRound,
 } from "lucide-react";
-import { navigate, formatPrice } from "../../utils";
+import { navigate, formatPrice, getSession } from "../../utils";
 import { Footer } from "../../components/LayoutParts";
 import { getFutureDateLabel } from "../../lib/dates.js";
 
@@ -66,7 +66,39 @@ export function ProfilePage({ isLoggedIn, role, onLogout }) {
   };
   const [profileInfo, setProfileInfo] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem("woodverse-profile-info")) || defaultProfile;
+      const session = getSession();
+
+      if (session?.user) {
+        return {
+          ...defaultProfile,
+          ...session.user,
+          fullName:
+            session.user.fullName ||
+            session.user.full_name ||
+            defaultProfile.fullName,
+          email: session.user.email || defaultProfile.email,
+        };
+      }
+
+      if (session) {
+        return {
+          ...defaultProfile,
+          ...session,
+          fullName:
+            session.fullName ||
+            session.full_name ||
+            defaultProfile.fullName,
+          email: session.email || defaultProfile.email,
+        };
+      }
+
+      const savedProfile = JSON.parse(
+        localStorage.getItem("woodverse-profile-info") || "null"
+      );
+
+      return savedProfile
+        ? { ...defaultProfile, ...savedProfile }
+        : defaultProfile;
     } catch {
       return defaultProfile;
     }

@@ -22,3 +22,6 @@ export const vendorShipmentsStorageKey = "woodverse-vendor-shipments";
 export const supplierIncomingRequestsStorageKey = "woodverse-supplier-incoming-requests";
 
 export const supplierNotificationsStorageKey = "woodverse-supplier-notifications";
+
+// The signed-in vendor's business identity, resolved from GET /api/vendors.
+export const vendorIdentityStorageKey = "woodverse-vendor-identity";

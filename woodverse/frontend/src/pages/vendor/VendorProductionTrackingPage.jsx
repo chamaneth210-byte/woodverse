@@ -15,6 +15,7 @@ import { productionStages } from "./seed.js";
 import { ModalShell, OrderInfo, SettingsInput, SettingsSelect } from "./shared";
 import { vendorProductionStorageKey } from "./storageKeys.js";
 import { getProductionProgress, getProductionTone } from "./tone.js";
+import { getFutureDateLabel } from "../../lib/dates.js";
 
 export function VendorProductionTrackingPage() {
   const [notice, setNotice] = useState("Production tracking loaded.");

@@ -17,6 +17,7 @@ import { getSupplierDefaultMaterial, getSupplierForMaterial, requestVendorNewOrd
 import { initialMaterialRequests, supplierMaterialStock, vendorSupplierDirectory } from "./seed.js";
 import { SettingsInput, SettingsSelect } from "./shared";
 import { supplierIncomingRequestsStorageKey, supplierNotificationsStorageKey } from "./storageKeys.js";
+import { getFutureDateLabel } from "../../lib/dates.js";
 
 export function VendorSuppliersPage() {
   const [notice, setNotice] = useState("Supplier coordination loaded.");

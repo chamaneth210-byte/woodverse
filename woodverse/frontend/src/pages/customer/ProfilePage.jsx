@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { navigate, formatPrice } from "../../utils";
 import { Footer } from "../../components/LayoutParts";
+import { getFutureDateLabel } from "../../lib/dates.js";
 
 // Each trade role works in its own portal. Without this the storefront has no route
 // into them, so a signed in vendor or supplier could only get there by typing a URL.
@@ -548,12 +549,6 @@ export function getNextVendorOrderId() {
   } catch {
     return `#WV-${Date.now().toString().slice(-4)}`;
   }
-}
-
-export function getFutureDateLabel(days) {
-  const date = new Date();
-  date.setDate(date.getDate() + days);
-  return date.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
 }
 
 export function buildCustomerFulfillmentPlan(orderItems) {

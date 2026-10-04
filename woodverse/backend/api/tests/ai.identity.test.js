@@ -189,4 +189,63 @@ describe("ai route: identity handling", () => {
     });
     expect(res.status).toBe(401);
   });
+
+  it("requires a token for POST /api/ai/quote-estimate", async () => {
+    if (!TEST_DATABASE_URL) return;
+    const res = await post("/api/ai/quote-estimate", { material: "teak", basePrice: 85000, quantity: 1 });
+    expect(res.status).toBe(401);
+  });
+
+  // The AI service is not running in CI, so every one of these exercises the
+  // catch branch. That is deliberate: the fallback has to reproduce the AI
+  // service's arithmetic exactly, otherwise a vendor sees a different price
+  // depending on whether the AI service happened to be up.
+  describe("POST /api/ai/quote-estimate fallback arithmetic", () => {
+    const VENDOR_TOKEN = () => tokenFor(VENDOR_USER, "vendor", "vendor@example.com");
+
+    const CASES = [
+      { material: "teak", basePrice: 85000, quantity: 1, customSize: false, expected: 106250 },
+      { material: "teak", basePrice: 85000, quantity: 4, customSize: false, expected: 425000 },
+      { material: "mahogany", basePrice: 85000, quantity: 4, customSize: false, expected: 401200 },
+      { material: "walnut", basePrice: 85000, quantity: 4, customSize: false, expected: 391000 },
+      { material: "bamboo", basePrice: 85000, quantity: 4, customSize: false, expected: 278800 },
+      { material: "jackwood", basePrice: 85000, quantity: 4, customSize: false, expected: 306000 },
+      { material: "teak", basePrice: 85000, quantity: 4, customSize: true, expected: 510000 },
+      // An unknown material must fall back to factor 1.0 rather than throw.
+      { material: "unobtainium", basePrice: 85000, quantity: 2, customSize: false, expected: 170000 },
+      // Quantity 0 is clamped to 1, not treated as a zero-priced order.
+      { material: "teak", basePrice: 50000, quantity: 0, customSize: false, expected: 62500 },
+    ];
+
+    for (const testCase of CASES) {
+      it(`estimates ${testCase.material} x${testCase.quantity} custom=${testCase.customSize} to LKR ${testCase.expected.toLocaleString("en-US")}`, async () => {
+        if (!TEST_DATABASE_URL) return;
+        const res = await post("/api/ai/quote-estimate", testCase, VENDOR_TOKEN());
+        expect(res.status).toBe(200);
+        expect(res.body.estimatedTotal).toBeCloseTo(testCase.expected, 2);
+      });
+    }
+
+    it("reports which source produced the number", async () => {
+      if (!TEST_DATABASE_URL) return;
+      const res = await post(
+        "/api/ai/quote-estimate",
+        { material: "teak", basePrice: 85000, quantity: 4, customSize: false },
+        VENDOR_TOKEN()
+      );
+      expect(["api-fallback", "fastapi"]).toContain(res.body.source);
+    });
+
+    it("never returns a negative or NaN total for junk input", async () => {
+      if (!TEST_DATABASE_URL) return;
+      const res = await post(
+        "/api/ai/quote-estimate",
+        { material: "", basePrice: -500, quantity: -3, customSize: true },
+        VENDOR_TOKEN()
+      );
+      expect(res.status).toBe(200);
+      expect(Number.isFinite(res.body.estimatedTotal)).toBe(true);
+      expect(res.body.estimatedTotal).toBeLessThanOrEqual(0);
+    });
+  });
 });

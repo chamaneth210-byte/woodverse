@@ -7,6 +7,8 @@ import {
   Save,
   Search,
   Send,
+  Sparkles,
+  Wand2,
 } from "lucide-react";
 import { VendorHeader } from "./VendorHeader";
 import { VendorSidebar } from "./VendorSidebar";
@@ -16,6 +18,10 @@ import { getNextStoredVendorOrderId, requestVendorNewOrder } from "./orders.js";
 import { initialOrders, initialQuotations } from "./seed.js";
 import { ModalShell, SettingsInput, SettingsSelect } from "./shared";
 import { getOrderTone, getQuoteTone } from "./tone.js";
+import { apiRequest } from "../../utils.js";
+import { getFutureDateLabel } from "../../lib/dates.js";
+
+const ESTIMATE_MATERIALS = ["teak", "mahogany", "walnut", "jackwood", "bamboo"];
 
 export function VendorQuotationsPage() {
   const [notice, setNotice] = useState("Quotations loaded.");
@@ -199,10 +205,57 @@ export function QuotationFormModal({ quote, onClose, onSubmit }) {
     notes: quote?.notes || "",
   });
   const [error, setError] = useState("");
+  const [estimate, setEstimate] = useState({
+    material: "teak",
+    basePrice: "85000",
+    quantity: "1",
+    customSize: false,
+  });
+  const [estimateResult, setEstimateResult] = useState(null);
+  const [estimateError, setEstimateError] = useState("");
+  const [estimating, setEstimating] = useState(false);
 
   const updateField = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
     setError("");
+  };
+
+  const updateEstimate = (field, value) => {
+    setEstimate((current) => ({ ...current, [field]: value }));
+    setEstimateError("");
+  };
+
+  // Asks the API for a priced estimate. The number is a suggestion the vendor can
+  // overwrite, so the estimate never blocks saving the quotation.
+  const runEstimate = async () => {
+    const basePrice = Number(estimate.basePrice);
+    if (!Number.isFinite(basePrice) || basePrice <= 0) {
+      setEstimateError("Enter a base price above zero.");
+      return;
+    }
+    setEstimating(true);
+    setEstimateError("");
+    try {
+      const result = await apiRequest("/api/ai/quote-estimate", {
+        method: "POST",
+        body: JSON.stringify({
+          productType: form.product || "custom furniture",
+          material: estimate.material,
+          basePrice,
+          quantity: Number(estimate.quantity) || 1,
+          customSize: estimate.customSize,
+        }),
+      });
+      setEstimateResult(result);
+      if (result.estimatedTotal > 0) {
+        setForm((current) => ({ ...current, amount: String(Math.round(result.estimatedTotal)) }));
+      }
+    } catch (requestError) {
+      setEstimateError(requestError.message || "Could not reach the estimator.");
+      setEstimateResult(null);
+    } finally {
+      setEstimating(false);
+    }
   };
 
   const submitQuote = (event) => {
@@ -234,6 +287,70 @@ export function QuotationFormModal({ quote, onClose, onSubmit }) {
             <SettingsInput label="Valid Until" value={form.validUntil} onChange={(value) => updateField("validUntil", value)} />
           </div>
           <SettingsSelect label="Status" value={form.status} options={["Draft", "Sent", "Approved", "Converted", "Expired"]} onChange={(value) => updateField("status", value)} />
+
+          <fieldset className="grid gap-4 rounded-xl border border-[#d9d5cd] bg-[#f7f6f2] p-4">
+            <legend className="flex items-center gap-2 px-1 text-sm font-extrabold text-[#115745]">
+              <Wand2 className="h-4 w-4" />
+              AI Quotation Estimate
+            </legend>
+            <p className="text-xs font-semibold text-[#5c6460]">
+              Suggested price from material, quantity and custom sizing. You can overwrite the amount afterwards.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <SettingsInput
+                label="Base Price (LKR)"
+                value={estimate.basePrice}
+                onChange={(value) => updateEstimate("basePrice", value)}
+              />
+              <SettingsSelect
+                label="Material"
+                value={estimate.material}
+                options={ESTIMATE_MATERIALS}
+                onChange={(value) => updateEstimate("material", value)}
+              />
+              <SettingsInput
+                label="Quantity"
+                value={estimate.quantity}
+                onChange={(value) => updateEstimate("quantity", value)}
+              />
+              <label className="flex items-center gap-2 self-end pb-2 text-sm font-bold text-[#3d4541]">
+                <input
+                  type="checkbox"
+                  checked={estimate.customSize}
+                  onChange={(event) => updateEstimate("customSize", event.target.checked)}
+                  className="h-4 w-4 accent-[#115745]"
+                />
+                Custom sizing (+20%)
+              </label>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={runEstimate}
+                disabled={estimating}
+                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-[#115745] px-4 text-sm font-extrabold text-white disabled:opacity-60"
+              >
+                <Sparkles className="h-4 w-4" />
+                {estimating ? "Estimating…" : "Estimate Price"}
+              </button>
+              {estimateResult && (
+                <p className="text-sm font-extrabold text-[#115745]" data-testid="estimate-total">
+                  Estimated total: LKR {Number(estimateResult.estimatedTotal).toLocaleString("en-LK")}
+                </p>
+              )}
+            </div>
+            {estimateError && (
+              <p className="rounded-lg border border-[#f0b4b4] bg-[#fff0f0] px-3 py-2 text-sm font-bold text-[#b10015]">
+                {estimateError}
+              </p>
+            )}
+            {estimateResult?.notes && (
+              <p className="text-xs font-semibold text-[#5c6460]">
+                {estimateResult.notes} Confidence {estimateResult.confidence}. Source: {estimateResult.source}.
+              </p>
+            )}
+          </fieldset>
+
           <label className="grid gap-2 text-sm font-bold text-[#3d4541]">
             Notes
             <textarea value={form.notes} onChange={(event) => updateField("notes", event.target.value)} rows={4} className="rounded-lg border border-[#c4cbc7] bg-white px-3 py-2 font-semibold outline-none transition focus:border-[#115745]" />

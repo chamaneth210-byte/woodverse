@@ -12,6 +12,15 @@ import { aiRouter } from "./ai.js";
 import { notificationsRouter } from "./notifications.js";
 
 export function registerRoutes(app, io) {
+  // Must be registered before every router below. Express runs middleware in
+  // registration order, so a router mounted earlier would see request.io as
+  // undefined and its `if (request.io)` guard would silently skip the emit —
+  // which is exactly what stopped new orders reaching the vendor.
+  app.use((request, response, next) => {
+    request.io = io;
+    next();
+  });
+
   app.use(healthRouter);
   app.use(authRouter);
   app.use(catalogRouter);
@@ -22,11 +31,6 @@ export function registerRoutes(app, io) {
   app.use(quotationsRouter);
   app.use(messagesRouter);
   app.use(aiRouter);
-
-  app.use((request, response, next) => {
-    request.io = io;
-    next();
-  });
   app.use(notificationsRouter);
 
   app.get("/", (request, response) => {

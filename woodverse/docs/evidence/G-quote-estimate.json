@@ -1,0 +1,246 @@
+{
+  "formula": "round(basePrice * max(1,quantity) * materialFactor * customFactor, 2)",
+  "materialFactors": {
+    "teak": 1.25,
+    "mahogany": 1.18,
+    "walnut": 1.15,
+    "jackwood": 0.9,
+    "bamboo": 0.82
+  },
+  "customSizeFactor": 1.2,
+  "defaultFactorForUnknownMaterial": 1.0,
+  "cases": [
+    {
+      "input": {
+        "productType": "dining table",
+        "material": "teak",
+        "basePrice": 85000,
+        "quantity": 1,
+        "customSize": false
+      },
+      "expected": 106250.0,
+      "actual": 106250.0,
+      "factorApplied": 1.25,
+      "match": true,
+      "response": {
+        "productType": "dining table",
+        "material": "teak",
+        "quantity": 1,
+        "estimatedTotal": 106250.0,
+        "confidence": 0.74,
+        "notes": "Prototype estimate based on material, quantity, and custom sizing factors."
+      }
+    },
+    {
+      "input": {
+        "productType": "dining table",
+        "material": "teak",
+        "basePrice": 85000,
+        "quantity": 4,
+        "customSize": false
+      },
+      "expected": 425000.0,
+      "actual": 425000.0,
+      "factorApplied": 1.25,
+      "match": true,
+      "response": {
+        "productType": "dining table",
+        "material": "teak",
+        "quantity": 4,
+        "estimatedTotal": 425000.0,
+        "confidence": 0.74,
+        "notes": "Prototype estimate based on material, quantity, and custom sizing factors."
+      }
+    },
+    {
+      "input": {
+        "productType": "dining table",
+        "material": "mahogany",
+        "basePrice": 85000,
+        "quantity": 4,
+        "customSize": false
+      },
+      "expected": 401200.0,
+      "actual": 401200.0,
+      "factorApplied": 1.18,
+      "match": true,
+      "response": {
+        "productType": "dining table",
+        "material": "mahogany",
+        "quantity": 4,
+        "estimatedTotal": 401200.0,
+        "confidence": 0.74,
+        "notes": "Prototype estimate based on material, quantity, and custom sizing factors."
+      }
+    },
+    {
+      "input": {
+        "productType": "dining table",
+        "material": "walnut",
+        "basePrice": 85000,
+        "quantity": 4,
+        "customSize": false
+      },
+      "expected": 391000.0,
+      "actual": 391000.0,
+      "factorApplied": 1.15,
+      "match": true,
+      "response": {
+        "productType": "dining table",
+        "material": "walnut",
+        "quantity": 4,
+        "estimatedTotal": 391000.0,
+        "confidence": 0.74,
+        "notes": "Prototype estimate based on material, quantity, and custom sizing factors."
+      }
+    },
+    {
+      "input": {
+        "productType": "dining table",
+        "material": "bamboo",
+        "basePrice": 85000,
+        "quantity": 4,
+        "customSize": false
+      },
+      "expected": 278800.0,
+      "actual": 278800.0,
+      "factorApplied": 0.82,
+      "match": true,
+      "response": {
+        "productType": "dining table",
+        "material": "bamboo",
+        "quantity": 4,
+        "estimatedTotal": 278800.0,
+        "confidence": 0.74,
+        "notes": "Prototype estimate based on material, quantity, and custom sizing factors."
+      }
+    },
+    {
+      "input": {
+        "productType": "dining table",
+        "material": "jackwood",
+        "basePrice": 85000,
+        "quantity": 4,
+        "customSize": false
+      },
+      "expected": 306000.0,
+      "actual": 306000.0,
+      "factorApplied": 0.9,
+      "match": true,
+      "response": {
+        "productType": "dining table",
+        "material": "jackwood",
+        "quantity": 4,
+        "estimatedTotal": 306000.0,
+        "confidence": 0.74,
+        "notes": "Prototype estimate based on material, quantity, and custom sizing factors."
+      }
+    },
+    {
+      "input": {
+        "productType": "dining table",
+        "material": "teak",
+        "basePrice": 85000,
+        "quantity": 4,
+        "customSize": true
+      },
+      "expected": 510000.0,
+      "actual": 510000.0,
+      "factorApplied": 1.5,
+      "match": true,
+      "response": {
+        "productType": "dining table",
+        "material": "teak",
+        "quantity": 4,
+        "estimatedTotal": 510000.0,
+        "confidence": 0.74,
+        "notes": "Prototype estimate based on material, quantity, and custom sizing factors."
+      }
+    },
+    {
+      "input": {
+        "productType": "dining table",
+        "material": "teak",
+        "basePrice": 85000,
+        "quantity": 12,
+        "customSize": true
+      },
+      "expected": 1530000.0,
+      "actual": 1530000.0,
+      "factorApplied": 1.5,
+      "match": true,
+      "response": {
+        "productType": "dining table",
+        "material": "teak",
+        "quantity": 12,
+        "estimatedTotal": 1530000.0,
+        "confidence": 0.74,
+        "notes": "Prototype estimate based on material, quantity, and custom sizing factors."
+      }
+    },
+    {
+      "input": {
+        "productType": "dining table",
+        "material": "teak",
+        "basePrice": 240000,
+        "quantity": 2,
+        "customSize": false
+      },
+      "expected": 600000.0,
+      "actual": 600000.0,
+      "factorApplied": 1.25,
+      "match": true,
+      "response": {
+        "productType": "dining table",
+        "material": "teak",
+        "quantity": 2,
+        "estimatedTotal": 600000.0,
+        "confidence": 0.74,
+        "notes": "Prototype estimate based on material, quantity, and custom sizing factors."
+      }
+    },
+    {
+      "input": {
+        "productType": "dining table",
+        "material": "unobtainium",
+        "basePrice": 85000,
+        "quantity": 2,
+        "customSize": false
+      },
+      "expected": 170000.0,
+      "actual": 170000.0,
+      "factorApplied": 1.0,
+      "match": true,
+      "response": {
+        "productType": "dining table",
+        "material": "unobtainium",
+        "quantity": 2,
+        "estimatedTotal": 170000.0,
+        "confidence": 0.74,
+        "notes": "Prototype estimate based on material, quantity, and custom sizing factors."
+      }
+    },
+    {
+      "input": {
+        "productType": "dining table",
+        "material": "teak",
+        "basePrice": 50000,
+        "quantity": 0,
+        "customSize": false
+      },
+      "expected": 62500.0,
+      "actual": 62500.0,
+      "factorApplied": 1.25,
+      "match": true,
+      "response": {
+        "productType": "dining table",
+        "material": "teak",
+        "quantity": 0,
+        "estimatedTotal": 62500.0,
+        "confidence": 0.74,
+        "notes": "Prototype estimate based on material, quantity, and custom sizing factors."
+      }
+    }
+  ],
+  "allMatch": true
+}

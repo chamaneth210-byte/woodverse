@@ -1,0 +1,178 @@
+{
+  "headline_case": {
+    "requiresVendorApproval": true,
+    "productionTrackingRequired": true,
+    "fulfillmentPlan": [
+      {
+        "id": "a7e2750f-95d0-474d-80c3-4479012c2b18",
+        "name": "Carved Teak Dining Table",
+        "vendor": "Kasun Fernando Woodcraft",
+        "quantity": 9,
+        "available": 3,
+        "stock": "Out of Stock",
+        "decision": "manufacture",
+        "vendorApprovalRequired": true,
+        "productionTrackingRequired": true,
+        "nextStep": "Send to vendor approval, then create production work order.",
+        "reason": "Available stock is lower than customer quantity."
+      }
+    ],
+    "source": "fastapi-scikit-learn"
+  },
+  "via_node_api": {
+    "requiresVendorApproval": true,
+    "productionTrackingRequired": true,
+    "fulfillmentPlan": [
+      {
+        "id": "a7e2750f-95d0-474d-80c3-4479012c2b18",
+        "name": "Carved Teak Dining Table",
+        "vendor": "Kasun Fernando Woodcraft",
+        "quantity": 9,
+        "available": 3,
+        "stock": "3 units available",
+        "decision": "manufacture",
+        "vendorApprovalRequired": true,
+        "productionTrackingRequired": true,
+        "nextStep": "Send to vendor approval, then create production work order.",
+        "reason": "Available stock is lower than customer quantity."
+      }
+    ],
+    "source": "fastapi-scikit-learn"
+  },
+  "boundary_sweep": [
+    {
+      "quantity": 1,
+      "available": 1,
+      "stockType": null,
+      "decision": "stock",
+      "vendorApprovalRequired": false,
+      "productionTrackingRequired": false,
+      "reason": "Available stock can cover the customer order."
+    },
+    {
+      "quantity": 3,
+      "available": 3,
+      "stockType": null,
+      "decision": "stock",
+      "vendorApprovalRequired": false,
+      "productionTrackingRequired": false,
+      "reason": "Available stock can cover the customer order."
+    },
+    {
+      "quantity": 9,
+      "available": 3,
+      "stockType": null,
+      "decision": "manufacture",
+      "vendorApprovalRequired": true,
+      "productionTrackingRequired": true,
+      "reason": "Available stock is lower than customer quantity."
+    },
+    {
+      "quantity": 4,
+      "available": 4,
+      "stockType": null,
+      "decision": "stock",
+      "vendorApprovalRequired": false,
+      "productionTrackingRequired": false,
+      "reason": "Available stock can cover the customer order."
+    },
+    {
+      "quantity": 10,
+      "available": 3,
+      "stockType": "out",
+      "decision": "manufacture",
+      "vendorApprovalRequired": true,
+      "productionTrackingRequired": true,
+      "reason": "Available stock is lower than customer quantity."
+    },
+    {
+      "quantity": 1,
+      "available": 0,
+      "stockType": null,
+      "decision": "manufacture",
+      "vendorApprovalRequired": true,
+      "productionTrackingRequired": true,
+      "reason": "Available stock is lower than customer quantity."
+    },
+    {
+      "quantity": 5,
+      "available": 5,
+      "stockType": null,
+      "decision": "stock",
+      "vendorApprovalRequired": false,
+      "productionTrackingRequired": false,
+      "reason": "Available stock can cover the customer order."
+    },
+    {
+      "quantity": 2,
+      "available": 10,
+      "stockType": null,
+      "decision": "stock",
+      "vendorApprovalRequired": false,
+      "productionTrackingRequired": false,
+      "reason": "Available stock can cover the customer order."
+    },
+    {
+      "quantity": 6,
+      "available": 6,
+      "stockType": "in",
+      "decision": "stock",
+      "vendorApprovalRequired": false,
+      "productionTrackingRequired": false,
+      "reason": "Available stock can cover the customer order."
+    }
+  ],
+  "multi_line": {
+    "requiresVendorApproval": true,
+    "productionTrackingRequired": true,
+    "fulfillmentPlan": [
+      {
+        "id": "11111111-1111-4111-8111-111111111111",
+        "name": "Bamboo Coaster Set",
+        "vendor": "Lanka Wood",
+        "quantity": 4,
+        "available": 40,
+        "stock": "In Stock",
+        "decision": "stock",
+        "vendorApprovalRequired": false,
+        "productionTrackingRequired": false,
+        "nextStep": "Reserve inventory and create delivery shipment.",
+        "reason": "Available stock can cover the customer order."
+      },
+      {
+        "id": "a7e2750f-95d0-474d-80c3-4479012c2b18",
+        "name": "Carved Teak Dining Table",
+        "vendor": "Kasun Fernando Woodcraft",
+        "quantity": 9,
+        "available": 3,
+        "stock": "Out of Stock",
+        "decision": "manufacture",
+        "vendorApprovalRequired": true,
+        "productionTrackingRequired": true,
+        "nextStep": "Send to vendor approval, then create production work order.",
+        "reason": "Available stock is lower than customer quantity."
+      }
+    ],
+    "source": "fastapi-scikit-learn"
+  },
+  "forced_override_known_bug": {
+    "requiresVendorApproval": true,
+    "productionTrackingRequired": true,
+    "fulfillmentPlan": [
+      {
+        "id": "33333333-3333-4333-8333-333333333333",
+        "name": "Teak Stool",
+        "vendor": "Lanka Wood",
+        "quantity": 1,
+        "available": 50,
+        "stock": "In Stock",
+        "decision": "manufacture",
+        "vendorApprovalRequired": true,
+        "productionTrackingRequired": true,
+        "nextStep": "Send to vendor approval, then create production work order.",
+        "reason": "Available stock is lower than customer quantity."
+      }
+    ],
+    "source": "fastapi-scikit-learn"
+  }
+}

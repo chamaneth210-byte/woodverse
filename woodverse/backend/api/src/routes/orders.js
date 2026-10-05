@@ -147,6 +147,11 @@ ordersRouter.get("/api/orders", authenticateToken, authorizeRoles("admin", "vend
     } else if (request.user.role === "vendor") {
       const vendorResult = await query("SELECT id FROM vendors WHERE user_id = $1", [request.user.id]);
       const vendorId = vendorResult.rows[0]?.id;
+
+      console.log("🔎 Vendor order lookup:", {
+        userId: request.user.id,
+        vendorId,
+      });
       // A vendor with no vendor row yet sees nothing rather than everyone's orders.
       if (!vendorId) return response.json({ orders: [] });
       result = await query(`${selectOrders} WHERE o.vendor_id = $1 ORDER BY o.created_at DESC`, [vendorId]);

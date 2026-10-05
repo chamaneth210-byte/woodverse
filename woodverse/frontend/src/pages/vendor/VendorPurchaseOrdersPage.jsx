@@ -60,42 +60,126 @@ export function VendorPurchaseOrdersPage() {
     }
   };
 
-  const createPurchaseOrder = (event) => {
+  const createPurchaseOrder = async (event) => {
     event.preventDefault();
-    if (!selectedSupplier?.name || !material.trim() || numericQuantity <= 0 || numericUnitPrice <= 0 || !linkedWork.trim() || !dueDate) {
-      setNotice("Supplier, material, quantity, unit price, work order, and due date are required.");
+
+    if (
+      !selectedSupplier?.name ||
+      !material.trim() ||
+      numericQuantity <= 0 ||
+      numericUnitPrice <= 0 ||
+      !linkedWork.trim() ||
+      !dueDate
+    ) {
+      setNotice(
+        "Supplier, material, quantity, unit price, work order, and due date are required."
+      );
       return;
     }
-    const numericIds = purchaseOrders.map((order) => Number(order.id.replace("VPO-", ""))).filter(Boolean);
-    const nextId = `VPO-${Math.max(...numericIds, 2104) + 1}`;
-    const purchaseOrder = {
-      id: nextId,
-      supplier: selectedSupplier.name,
-      supplierId: selectedSupplier.id,
-      material,
-      quantity: numericQuantity,
-      unit,
-      unitPrice: numericUnitPrice,
-      linkedWork,
-      status: "Sent",
-      dueDate,
-      total: draftTotal,
-      notes: notes.trim(),
-      createdAt: "Just now",
+
+    const token = localStorage.getItem("woodverse-auth-token");
+
+    if (!token) {
+      setNotice("Please log in again. Authentication token is missing.");
+      return;
+    }
+
+    /*
+     * Frontend supplier IDs are demo IDs such as SUP-301.
+     * The backend needs the real PostgreSQL supplier UUID.
+     */
+    const supplierDatabaseIds = {
+      "SUP-301": "804b66eb-8afb-4a34-a845-b617986bd1f2",
     };
-    setPurchaseOrders((items) => [purchaseOrder, ...items]);
-    appendStoredList(supplierNotificationsStorageKey, {
-      id: `spo-${Date.now()}`,
-      type: "Purchase Order",
-      title: `New purchase order ${nextId} from ${getVendorIdentity().businessName}`,
-      detail: `${numericQuantity} ${unit} of ${material} for ${linkedWork}. Total LKR ${draftTotal.toLocaleString("en-US")}. Due ${dueDate}.`,
-      time: "Just now",
-      priority: "High",
-      sourcePurchaseOrderId: nextId,
-    });
-    setStatus("Sent");
-    setNotice(`${nextId} sent to ${selectedSupplier.name}. Supplier can see it in notifications.`);
+
+    const supplierDatabaseId = supplierDatabaseIds[selectedSupplier.id];
+
+    if (!supplierDatabaseId) {
+      setNotice(
+        `No database supplier ID is configured for ${selectedSupplier.name}.`
+      );
+      return;
+    }
+
+    try {
+      setNotice("Sending purchase order to supplier...");
+
+      const apiUrl =
+        import.meta.env.VITE_API_URL ||
+        "https://woodverse-api-production.up.railway.app";
+
+      const response = await fetch(`${apiUrl}/api/purchase-orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          supplierId: supplierDatabaseId,
+          productName: material.trim(),
+          quantity: numericQuantity,
+          notes: `${notes.trim()} Work Order: ${linkedWork}. Due date: ${dueDate}. Unit: ${unit}. Unit price: LKR ${numericUnitPrice.toLocaleString("en-US")}.`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("❌ Purchase order API error:", data);
+        setNotice(
+          data?.error ||
+            data?.message ||
+            "Failed to send purchase order to supplier."
+        );
+        return;
+      }
+
+      console.log("✅ Purchase order created:", data);
+
+      const backendOrder = data.purchaseOrder || data;
+
+      const purchaseOrder = {
+        id: backendOrder.id || `VPO-${Date.now()}`,
+        supplier: selectedSupplier.name,
+        supplierId: selectedSupplier.id,
+        material,
+        quantity: numericQuantity,
+        unit,
+        unitPrice: numericUnitPrice,
+        linkedWork,
+        status: "Sent",
+        dueDate,
+        total: draftTotal,
+        notes: notes.trim(),
+        createdAt: "Just now",
+        backendId: backendOrder.id,
+      };
+
+      setPurchaseOrders((items) => [purchaseOrder, ...items]);
+
+      appendStoredList(supplierNotificationsStorageKey, {
+        id: `spo-${Date.now()}`,
+        type: "Purchase Order",
+        title: `New purchase order from ${getVendorIdentity().businessName}`,
+        detail: `${numericQuantity} ${unit} of ${material} for ${linkedWork}. Total LKR ${draftTotal.toLocaleString("en-US")}. Due ${dueDate}.`,
+        time: "Just now",
+        priority: "High",
+        sourcePurchaseOrderId: backendOrder.id,
+      });
+
+      setStatus("Sent");
+
+      setNotice(
+        `Purchase order sent successfully to ${selectedSupplier.name}.`
+      );
+    } catch (error) {
+      console.error("❌ Purchase order request failed:", error);
+      setNotice(
+        "Could not connect to the WoodVerse API. Please try again."
+      );
+    }
   };
+
 
   const updatePurchaseOrderStatus = (order, nextStatus) => {
     setPurchaseOrders((items) => items.map((item) => (item.id === order.id ? { ...item, status: nextStatus } : item)));

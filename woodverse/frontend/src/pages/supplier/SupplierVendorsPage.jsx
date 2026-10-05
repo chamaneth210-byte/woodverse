@@ -21,6 +21,8 @@ import { formatLkrCompact, formatMessageTime } from "./format.js";
 import { SupplierProfileField } from "./shared";
 
 export function SupplierVendorsPage({ theme, onToggleTheme }) {
+  console.log("🚨🚨🚨 SUPPLIER VENDORS PAGE IS RENDERING 🚨🚨🚨");
+  console.log("🚨🚨🚨 SUPPLIER VENDORS PAGE IS RENDERING 🚨🚨🚨");
   const [notice, setNotice] = useState("Vendor network loaded with 42 active marketplace partners.");
   const [showMap, setShowMap] = useState(false);
   const [mapRegion, setMapRegion] = useState("Sri Lanka timber suppliers");
@@ -89,24 +91,64 @@ export function SupplierVendorsPage({ theme, onToggleTheme }) {
   });
 
   useEffect(() => {
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || "/";
+    console.log("🚨🚨🚨 SUPPLIER VENDORS PAGE SOCKET EFFECT STARTED 🚨🚨🚨");
+
+    const configuredSocketUrl = import.meta.env.VITE_SOCKET_URL;
+
+    const socketUrl =
+      configuredSocketUrl && configuredSocketUrl !== "/"
+        ? configuredSocketUrl
+        : import.meta.env.VITE_API_URL || "http://localhost:4000";
+
+    const token = localStorage.getItem("woodverse-auth-token");
+
+    console.log("🔌 Supplier Socket.IO URL:", socketUrl);
+    console.log("🔑 Supplier Socket token exists:", Boolean(token));
+
+    if (!token) {
+      console.warn("⚠️ Supplier Socket.IO: authentication token is missing.");
+      setSocketStatus("Offline");
+      return;
+    }
+
     const socket = io(socketUrl, {
-      auth: { token: localStorage.getItem("woodverse-auth-token") },
+      auth: { token },
       autoConnect: true,
-      reconnectionAttempts: 3,
+      reconnectionAttempts: 5,
       transports: ["websocket", "polling"],
     });
 
     const handleConnect = () => {
+      console.log("✅ Supplier Socket.IO connected:", socket.id);
+
       setSocketStatus("Connected");
-      socket.emit("vendor:join", { room: "supplier-vendor-messages", supplier: "Lumbini Timber Co." });
+
+      socket.emit("vendor:join", {
+        room: "supplier-vendor-messages",
+        supplier: "Lumbini Timber Co.",
+      });
+
+      console.log("📡 Supplier joined vendor messaging room");
     };
-    const handleDisconnect = () => setSocketStatus("Offline");
-    const handleConnectError = () => setSocketStatus("Offline");
+
+    const handleDisconnect = () => {
+      console.log("❌ Supplier Socket.IO disconnected");
+      setSocketStatus("Offline");
+    };
+
+    const handleConnectError = (error) => {
+      console.error(
+        "❌ Supplier Socket.IO connection error:",
+        error.message
+      );
+      setSocketStatus("Offline");
+    };
+
     const handleIncomingMessage = (message) => {
       if (!message?.vendor || !message?.text) {
         return;
       }
+
       setVendorMessages((threads) => ({
         ...threads,
         [message.vendor]: [
@@ -121,10 +163,58 @@ export function SupplierVendorsPage({ theme, onToggleTheme }) {
       }));
     };
 
+    const handlePurchaseOrder = (event) => {
+      console.log("📦 New supplier purchase order received:", event);
+
+      const purchaseOrder = event?.purchaseOrder;
+
+      if (!purchaseOrder) {
+        console.warn("⚠️ Purchase order event did not contain purchaseOrder.");
+        return;
+      }
+
+      const incomingOrder = {
+        id: purchaseOrder.id,
+        vendor:
+          purchaseOrder.vendor_name ||
+          purchaseOrder.vendor_email ||
+          "WoodVerse Vendor",
+        material: purchaseOrder.product_name || "Material",
+        quantity: Number(purchaseOrder.quantity || 0),
+        unitPrice: 0,
+        total: 0,
+        deliveryDate: "Pending",
+        destination: "Supplier Yard",
+        notes: purchaseOrder.notes || "",
+        status: "Pending",
+        createdAt: purchaseOrder.created_at
+          ? formatMessageTime(new Date(purchaseOrder.created_at))
+          : formatMessageTime(new Date()),
+      };
+
+      setPurchaseOrders((orders) => {
+        const alreadyExists = orders.some(
+          (order) => order.id === incomingOrder.id
+        );
+
+        if (alreadyExists) {
+          return orders;
+        }
+
+        return [incomingOrder, ...orders];
+      });
+
+      setNotice(
+        `📦 New purchase order received from ${incomingOrder.vendor}.`
+      );
+    };
+
     socket.on("connect", handleConnect);
     socket.on("disconnect", handleDisconnect);
     socket.on("connect_error", handleConnectError);
     socket.on("vendor:message", handleIncomingMessage);
+    socket.on("supplier:purchase-order", handlePurchaseOrder);
+
     setSocketClient(socket);
 
     return () => {
@@ -132,6 +222,7 @@ export function SupplierVendorsPage({ theme, onToggleTheme }) {
       socket.off("disconnect", handleDisconnect);
       socket.off("connect_error", handleConnectError);
       socket.off("vendor:message", handleIncomingMessage);
+      socket.off("supplier:purchase-order", handlePurchaseOrder);
       socket.disconnect();
     };
   }, []);

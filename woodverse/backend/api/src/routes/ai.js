@@ -24,17 +24,19 @@ function buildAiPayload(request) {
 
 /* =========================================================
    AI CHAT
+   Endpoint:
+   POST /api/ai/chat
    ========================================================= */
 
 aiRouter.post(
-  "/api/ai/chat",
+  "/chat",
   authenticateToken,
   async (request, response) => {
     const payload = buildAiPayload(request);
 
     try {
       const aiServiceUrl =
-        process.env.AI_SERVICE_URL || "http://localhost:8000";
+        process.env.AI_SERVICE_URL || "http://127.0.0.1:8010";
 
       const result = await callAiService(
         aiServiceUrl,
@@ -58,15 +60,17 @@ aiRouter.post(
 
 /* =========================================================
    AI STOCK / MANUFACTURE DECISION
+   Endpoint:
+   POST /api/ai/stock-decision
    ========================================================= */
 
 aiRouter.post(
-  "/api/ai/stock-decision",
+  "/stock-decision",
   authenticateToken,
   async (request, response) => {
     try {
       const aiServiceUrl =
-        process.env.AI_SERVICE_URL || "http://localhost:8000";
+        process.env.AI_SERVICE_URL || "http://127.0.0.1:8010";
 
       const result = await callAiService(
         aiServiceUrl,
@@ -102,10 +106,13 @@ aiRouter.post(
           requiresVendorApproval: fulfillmentPlan.some(
             (item) => item.vendorApprovalRequired
           ),
+
           productionTrackingRequired: fulfillmentPlan.some(
             (item) => item.decision === "manufacture"
           ),
+
           fulfillmentPlan,
+
           source: "api-fallback",
         });
       } catch (fallbackError) {
@@ -125,53 +132,66 @@ aiRouter.post(
 
 /* =========================================================
    AI QUOTATION
-   =========================================================
+   Endpoint:
+   POST /api/ai/quote-estimate
 
    Formula:
 
    Estimated Total =
    Base Price × Quantity × Material Factor × Custom Size Factor
-
-   Example:
-
-   50,000 × 2 × 1.25 × 1.20
-   = Rs. 150,000
    ========================================================= */
 
 const QUOTE_MATERIAL_FACTORS = {
   teak: 1.25,
   mahogany: 1.18,
   walnut: 1.15,
-  jackwood: 0.90,
+  jackwood: 0.9,
   bamboo: 0.82,
 };
 
-const QUOTE_CUSTOM_SIZE_FACTOR = 1.20;
+const QUOTE_CUSTOM_SIZE_FACTOR = 1.2;
 
-// The AI service applies the same factors, so this reproduces its arithmetic exactly. A
-// vendor must not be quoted a different price depending on whether the AI service happened
-// to be reachable, so both paths are asserted against the same expected totals in
-// tests/ai.identity.test.js.
+/* =========================================================
+   LOCAL QUOTATION FALLBACK
+   ========================================================= */
+
 function localQuoteEstimate(body = {}) {
-  const productType = body.productType || "Custom Furniture";
+  const productType =
+    body.productType || "Custom Furniture";
 
-  const material = String(body.material || "teak")
+  const material = String(
+    body.material || "teak"
+  )
     .trim()
     .toLowerCase();
 
-  const basePrice = Number(body.basePrice) || 0;
+  const basePrice =
+    Number(body.basePrice) || 0;
 
-  const quantity = Math.max(1, Number(body.quantity) || 1);
+  const quantity = Math.max(
+    1,
+    Number(body.quantity) || 1
+  );
 
   const customSize =
-    body.customSize === true || body.customSize === "true";
+    body.customSize === true ||
+    body.customSize === "true";
 
-  const materialFactor = QUOTE_MATERIAL_FACTORS[material] || 1;
+  const materialFactor =
+    QUOTE_MATERIAL_FACTORS[material] || 1;
 
-  const customSizeFactor = customSize ? QUOTE_CUSTOM_SIZE_FACTOR : 1;
+  const customSizeFactor =
+    customSize
+      ? QUOTE_CUSTOM_SIZE_FACTOR
+      : 1;
 
   const estimatedTotal = Number(
-    (basePrice * quantity * materialFactor * customSizeFactor).toFixed(2)
+    (
+      basePrice *
+      quantity *
+      materialFactor *
+      customSizeFactor
+    ).toFixed(2)
   );
 
   return {
@@ -184,24 +204,42 @@ function localQuoteEstimate(body = {}) {
     customSizeFactor,
     estimatedTotal,
     confidence: 0.74,
+
     notes:
       "Quotation calculated using base price, quantity, material, and custom-size factors.",
+
     source: "api-fallback",
   };
 }
 
+/* =========================================================
+   AI QUOTATION ROUTE
+   ========================================================= */
+
 aiRouter.post(
-  "/api/ai/quote-estimate",
+  "/quote-estimate",
   authenticateToken,
   async (request, response) => {
     const body = request.body || {};
 
-    // The local estimate is computed first so it can answer when the AI service is down,
-    // and so a malformed AI response cannot leave the vendor without a number.
-    const fallback = localQuoteEstimate(body);
+    /*
+     * Calculate local fallback first.
+     * This means the system can still return a quotation
+     * if the FastAPI AI service is unavailable.
+     */
+
+    const fallback =
+      localQuoteEstimate(body);
 
     try {
-      const aiServiceUrl = process.env.AI_SERVICE_URL || "http://localhost:8000";
+      const aiServiceUrl =
+        process.env.AI_SERVICE_URL ||
+        "http://127.0.0.1:8010";
+
+      console.log(
+        "Calling AI service:",
+        aiServiceUrl
+      );
 
       const result = await callAiService(
         aiServiceUrl,
@@ -209,37 +247,71 @@ aiRouter.post(
         body
       );
 
-      // The AI service omits the factor breakdown, so it is filled in from the same table
-      // the fallback uses. That keeps one response shape for the UI regardless of source.
-      const estimatedTotal = Number(result?.estimatedTotal);
+      /*
+       * Validate AI response.
+       */
+
+      const estimatedTotal =
+        Number(result?.estimatedTotal);
 
       if (!Number.isFinite(estimatedTotal)) {
-        throw new Error("AI service returned a non-numeric estimatedTotal");
+        throw new Error(
+          "AI service returned a non-numeric estimatedTotal"
+        );
       }
+
+      /*
+       * Return AI result while keeping
+       * the same response structure as fallback.
+       */
 
       return response.json({
         ...fallback,
         ...result,
+
         estimatedTotal,
-        source: result?.source || "fastapi",
+
+        source:
+          result?.source || "fastapi",
       });
     } catch (error) {
-      console.error("AI quote estimate service unavailable:", error);
+      console.error(
+        "AI quote estimate service unavailable:",
+        error
+      );
 
-      return response.json(fallback);
+      /*
+       * AI service failed.
+       * Return local quotation instead.
+       */
+
+      return response.json(
+        fallback
+      );
     }
   }
 );
 
 /* =========================================================
    AI ORDERS
+   Endpoint:
+   GET /api/ai/orders
    ========================================================= */
 
 aiRouter.get(
-  "/api/ai/orders",
+  "/orders",
   authenticateToken,
-  authorizeRoles("admin", "vendor", "customer"),
+  authorizeRoles(
+    "admin",
+    "vendor",
+    "customer"
+  ),
   async (request, response) => {
+    /*
+     * If PostgreSQL is not configured,
+     * return an empty order list.
+     */
+
     if (!databaseConfigured) {
       return response.json({
         orders: [],
@@ -253,18 +325,53 @@ aiRouter.get(
 
       let result;
 
+      /* ===============================
+         ADMIN
+         =============================== */
+
       if (isAdmin) {
         result = await query(
-          "SELECT id, customer_id, vendor_id, status, total_amount, requires_manufacturing, created_at, updated_at FROM orders ORDER BY created_at DESC"
+          `
+          SELECT
+            id,
+            customer_id,
+            vendor_id,
+            status,
+            total_amount,
+            requires_manufacturing,
+            created_at,
+            updated_at
+          FROM orders
+          ORDER BY created_at DESC
+          `
         );
-      } else {
+      }
+
+      /* ===============================
+         CUSTOMER / VENDOR
+         =============================== */
+
+      else {
         result = await query(
-          "SELECT id, customer_id, vendor_id, status, total_amount, requires_manufacturing, created_at, updated_at FROM orders WHERE customer_id = $1 ORDER BY created_at DESC",
+          `
+          SELECT
+            id,
+            customer_id,
+            vendor_id,
+            status,
+            total_amount,
+            requires_manufacturing,
+            created_at,
+            updated_at
+          FROM orders
+          WHERE customer_id = $1
+          ORDER BY created_at DESC
+          `,
           [request.user.id]
         );
       }
 
-      response.json({
+      return response.json({
         orders: result.rows,
       });
     } catch (error) {
@@ -273,7 +380,7 @@ aiRouter.get(
         error
       );
 
-      response.status(500).json({
+      return response.status(500).json({
         error: error.message,
       });
     }

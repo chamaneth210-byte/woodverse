@@ -148,74 +148,85 @@ const QUOTE_MATERIAL_FACTORS = {
 
 const QUOTE_CUSTOM_SIZE_FACTOR = 1.20;
 
+// The AI service applies the same factors, so this reproduces its arithmetic exactly. A
+// vendor must not be quoted a different price depending on whether the AI service happened
+// to be reachable, so both paths are asserted against the same expected totals in
+// tests/ai.identity.test.js.
+function localQuoteEstimate(body = {}) {
+  const productType = body.productType || "Custom Furniture";
+
+  const material = String(body.material || "teak")
+    .trim()
+    .toLowerCase();
+
+  const basePrice = Number(body.basePrice) || 0;
+
+  const quantity = Math.max(1, Number(body.quantity) || 1);
+
+  const customSize =
+    body.customSize === true || body.customSize === "true";
+
+  const materialFactor = QUOTE_MATERIAL_FACTORS[material] || 1;
+
+  const customSizeFactor = customSize ? QUOTE_CUSTOM_SIZE_FACTOR : 1;
+
+  const estimatedTotal = Number(
+    (basePrice * quantity * materialFactor * customSizeFactor).toFixed(2)
+  );
+
+  return {
+    productType,
+    material,
+    quantity,
+    basePrice,
+    materialFactor,
+    customSize,
+    customSizeFactor,
+    estimatedTotal,
+    confidence: 0.74,
+    notes:
+      "Quotation calculated using base price, quantity, material, and custom-size factors.",
+    source: "api-fallback",
+  };
+}
+
 aiRouter.post(
   "/api/ai/quote-estimate",
   authenticateToken,
   async (request, response) => {
+    const body = request.body || {};
+
+    // The local estimate is computed first so it can answer when the AI service is down,
+    // and so a malformed AI response cannot leave the vendor without a number.
+    const fallback = localQuoteEstimate(body);
+
     try {
-      const body = request.body || {};
+      const aiServiceUrl = process.env.AI_SERVICE_URL || "http://localhost:8000";
 
-      const productType =
-        body.productType || "Custom Furniture";
-
-      const material =
-        String(body.material || "teak")
-          .trim()
-          .toLowerCase();
-
-      const basePrice =
-        Number(body.basePrice) || 0;
-
-      const quantity = Math.max(
-        1,
-        Number(body.quantity) || 1
+      const result = await callAiService(
+        aiServiceUrl,
+        "/ai/quote-estimate",
+        body
       );
 
-      const customSize =
-        body.customSize === true ||
-        body.customSize === "true";
+      // The AI service omits the factor breakdown, so it is filled in from the same table
+      // the fallback uses. That keeps one response shape for the UI regardless of source.
+      const estimatedTotal = Number(result?.estimatedTotal);
 
-      const materialFactor =
-        QUOTE_MATERIAL_FACTORS[material] || 1;
+      if (!Number.isFinite(estimatedTotal)) {
+        throw new Error("AI service returned a non-numeric estimatedTotal");
+      }
 
-      const customSizeFactor =
-        customSize
-          ? QUOTE_CUSTOM_SIZE_FACTOR
-          : 1;
-
-      const estimatedTotal = Number(
-        (
-          basePrice *
-          quantity *
-          materialFactor *
-          customSizeFactor
-        ).toFixed(2)
-      );
-
-      response.json({
-        productType,
-        material,
-        quantity,
-        basePrice,
-        materialFactor,
-        customSize,
-        customSizeFactor,
+      return response.json({
+        ...fallback,
+        ...result,
         estimatedTotal,
-        confidence: 0.74,
-        notes:
-          "Quotation calculated using base price, quantity, material, and custom-size factors.",
-        source: "local-formula",
+        source: result?.source || "fastapi",
       });
     } catch (error) {
-      console.error(
-        "Quote calculation error:",
-        error
-      );
+      console.error("AI quote estimate service unavailable:", error);
 
-      response.status(500).json({
-        error: "Unable to calculate quotation",
-        message: error.message,
-      });
+      return response.json(fallback);
     }
   }
 );

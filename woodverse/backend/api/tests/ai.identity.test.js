@@ -84,9 +84,12 @@ function post(path, body, token) {
 }
 
 describe("ai route: identity handling", () => {
+  // The server is started unconditionally. Only the tests that actually query Postgres
+  // are gated on TEST_DATABASE_URL; the quote-estimate route reads no tables, so gating
+  // it meant its assertions silently never ran and a wrong `source` value went unnoticed.
   beforeAll(async () => {
-    if (!TEST_DATABASE_URL) return;
-    await pool.query("TRUNCATE orders, vendors, users RESTART IDENTITY CASCADE");
+    if (TEST_DATABASE_URL) {
+      await pool.query("TRUNCATE orders, vendors, users RESTART IDENTITY CASCADE");
     await pool.query(
       `INSERT INTO users (id, email, full_name, role) VALUES
         ($1, 'a@example.com', 'Customer A', 'customer'),
@@ -104,12 +107,14 @@ describe("ai route: identity handling", () => {
         ($4, $5, $3, 'manufacturing', 480000, TRUE, '[{"name":"Customer B Secret","quantity":1}]', NOW())`,
       [ORDER_A, CUSTOMER_A, VENDOR_ID, ORDER_B, CUSTOMER_B]
     );
+    }
+
     await startServer();
   });
 
   afterAll(async () => {
     if (server) await new Promise((resolve) => server.close(resolve));
-    await pool.end();
+    if (TEST_DATABASE_URL) await pool.end();
   });
 
   it("rejects a request with no token", async () => {
@@ -191,53 +196,65 @@ describe("ai route: identity handling", () => {
   });
 
   it("requires a token for POST /api/ai/quote-estimate", async () => {
-    if (!TEST_DATABASE_URL) return;
     const res = await post("/api/ai/quote-estimate", { material: "teak", basePrice: 85000, quantity: 1 });
     expect(res.status).toBe(401);
   });
 
+  // Shared by both branches below. Whichever path answers must produce these totals.
+  const QUOTE_CASES = [
+    { material: "teak", basePrice: 85000, quantity: 1, customSize: false, expected: 106250 },
+    { material: "teak", basePrice: 85000, quantity: 4, customSize: false, expected: 425000 },
+    { material: "mahogany", basePrice: 85000, quantity: 4, customSize: false, expected: 401200 },
+    { material: "walnut", basePrice: 85000, quantity: 4, customSize: false, expected: 391000 },
+    { material: "bamboo", basePrice: 85000, quantity: 4, customSize: false, expected: 278800 },
+    { material: "jackwood", basePrice: 85000, quantity: 4, customSize: false, expected: 306000 },
+    { material: "teak", basePrice: 85000, quantity: 4, customSize: true, expected: 510000 },
+    // An unknown material must fall back to factor 1.0 rather than throw.
+    { material: "unobtainium", basePrice: 85000, quantity: 2, customSize: false, expected: 170000 },
+    // Quantity 0 is clamped to 1, not treated as a zero-priced order.
+    { material: "teak", basePrice: 50000, quantity: 0, customSize: false, expected: 62500 },
+  ];
+
   // The AI service is not running in CI, so every one of these exercises the
-  // catch branch. That is deliberate: the fallback has to reproduce the AI
+  // fallback branch. That is deliberate: the fallback has to reproduce the AI
   // service's arithmetic exactly, otherwise a vendor sees a different price
-  // depending on whether the AI service happened to be up.
+  // depending on whether the AI service happened to be up. The FastAPI branch is
+  // covered separately below with a stubbed service.
   describe("POST /api/ai/quote-estimate fallback arithmetic", () => {
     const VENDOR_TOKEN = () => tokenFor(VENDOR_USER, "vendor", "vendor@example.com");
 
-    const CASES = [
-      { material: "teak", basePrice: 85000, quantity: 1, customSize: false, expected: 106250 },
-      { material: "teak", basePrice: 85000, quantity: 4, customSize: false, expected: 425000 },
-      { material: "mahogany", basePrice: 85000, quantity: 4, customSize: false, expected: 401200 },
-      { material: "walnut", basePrice: 85000, quantity: 4, customSize: false, expected: 391000 },
-      { material: "bamboo", basePrice: 85000, quantity: 4, customSize: false, expected: 278800 },
-      { material: "jackwood", basePrice: 85000, quantity: 4, customSize: false, expected: 306000 },
-      { material: "teak", basePrice: 85000, quantity: 4, customSize: true, expected: 510000 },
-      // An unknown material must fall back to factor 1.0 rather than throw.
-      { material: "unobtainium", basePrice: 85000, quantity: 2, customSize: false, expected: 170000 },
-      // Quantity 0 is clamped to 1, not treated as a zero-priced order.
-      { material: "teak", basePrice: 50000, quantity: 0, customSize: false, expected: 62500 },
-    ];
+    let originalUrl;
 
-    for (const testCase of CASES) {
+    beforeAll(() => {
+      // Pinned to a closed port so this suite tests the fallback even on a developer
+      // machine where the AI service happens to be running.
+      originalUrl = process.env.AI_SERVICE_URL;
+      process.env.AI_SERVICE_URL = "http://127.0.0.1:1";
+    });
+
+    afterAll(() => {
+      if (originalUrl === undefined) delete process.env.AI_SERVICE_URL;
+      else process.env.AI_SERVICE_URL = originalUrl;
+    });
+
+    for (const testCase of QUOTE_CASES) {
       it(`estimates ${testCase.material} x${testCase.quantity} custom=${testCase.customSize} to LKR ${testCase.expected.toLocaleString("en-US")}`, async () => {
-        if (!TEST_DATABASE_URL) return;
         const res = await post("/api/ai/quote-estimate", testCase, VENDOR_TOKEN());
         expect(res.status).toBe(200);
         expect(res.body.estimatedTotal).toBeCloseTo(testCase.expected, 2);
       });
     }
 
-    it("reports which source produced the number", async () => {
-      if (!TEST_DATABASE_URL) return;
+    it("reports that the local formula produced the number", async () => {
       const res = await post(
         "/api/ai/quote-estimate",
         { material: "teak", basePrice: 85000, quantity: 4, customSize: false },
         VENDOR_TOKEN()
       );
-      expect(["api-fallback", "fastapi"]).toContain(res.body.source);
+      expect(res.body.source).toBe("api-fallback");
     });
 
     it("never returns a negative or NaN total for junk input", async () => {
-      if (!TEST_DATABASE_URL) return;
       const res = await post(
         "/api/ai/quote-estimate",
         { material: "", basePrice: -500, quantity: -3, customSize: true },
@@ -246,6 +263,129 @@ describe("ai route: identity handling", () => {
       expect(res.status).toBe(200);
       expect(Number.isFinite(res.body.estimatedTotal)).toBe(true);
       expect(res.body.estimatedTotal).toBeLessThanOrEqual(0);
+    });
+  });
+
+  // The route calls the AI service first and falls back locally. This stubs the service
+  // so the success path is asserted rather than assumed, which is what keeps the AI
+  // service's endpoint from quietly becoming dead code again.
+  describe("POST /api/ai/quote-estimate with the AI service reachable", () => {
+    const VENDOR_TOKEN = () => tokenFor(VENDOR_USER, "vendor", "vendor@example.com");
+
+    let stub;
+    let originalUrl;
+    let originalKey;
+    let receivedKey;
+    // Flipped by the malformed-response test so the stub can misbehave on demand.
+    let returnJunk = false;
+
+    beforeAll(async () => {
+      const { createServer } = await import("node:http");
+      originalUrl = process.env.AI_SERVICE_URL;
+      originalKey = process.env.AI_SERVICE_API_KEY;
+
+      stub = createServer((request, response) => {
+        receivedKey = request.headers["x-api-key"];
+        let raw = "";
+        request.on("data", (chunk) => (raw += chunk));
+        request.on("end", () => {
+          response.setHeader("content-type", "application/json");
+
+          if (returnJunk) {
+            response.end(JSON.stringify({ estimatedTotal: "not-a-number", confidence: 0.74 }));
+            return;
+          }
+
+          const body = JSON.parse(raw || "{}");
+          const factors = { teak: 1.25, mahogany: 1.18, walnut: 1.15, bamboo: 0.82, jackwood: 0.9 };
+          const materialFactor = factors[String(body.material || "teak").toLowerCase()] ?? 1.0;
+          const customSizeFactor = body.customSize ? 1.2 : 1.0;
+          response.end(
+            JSON.stringify({
+              productType: body.productType,
+              material: body.material,
+              quantity: body.quantity,
+              estimatedTotal: Math.round(body.basePrice * Math.max(1, body.quantity) * materialFactor * customSizeFactor * 100) / 100,
+              confidence: 0.74,
+              // Deliberately different from the fallback notes, so a test can prove the
+              // response came from the AI service rather than the local formula.
+              notes: "Prototype estimate based on material, quantity, and custom sizing factors.",
+            })
+          );
+        });
+      });
+
+      await new Promise((resolve) => stub.listen(0, "127.0.0.1", resolve));
+      process.env.AI_SERVICE_URL = `http://127.0.0.1:${stub.address().port}`;
+      process.env.AI_SERVICE_API_KEY = SERVICE_KEY;
+    });
+
+    afterAll(async () => {
+      if (originalUrl === undefined) delete process.env.AI_SERVICE_URL;
+      else process.env.AI_SERVICE_URL = originalUrl;
+      if (originalKey === undefined) delete process.env.AI_SERVICE_API_KEY;
+      else process.env.AI_SERVICE_API_KEY = originalKey;
+      if (stub) await new Promise((resolve) => stub.close(resolve));
+    });
+
+    // Same expected totals as the fallback suite. The two branches must agree exactly.
+    for (const testCase of QUOTE_CASES) {
+      it(`returns the AI service total for ${testCase.material} x${testCase.quantity}`, async () => {
+        const res = await post("/api/ai/quote-estimate", testCase, VENDOR_TOKEN());
+        expect(res.status).toBe(200);
+        expect(res.body.source).toBe("fastapi");
+        expect(res.body.estimatedTotal).toBeCloseTo(testCase.expected, 2);
+      });
+    }
+
+    it("falls back to the local formula when the AI service is unreachable", async () => {
+      const reachable = process.env.AI_SERVICE_URL;
+      process.env.AI_SERVICE_URL = "http://127.0.0.1:1";
+      try {
+        const res = await post(
+          "/api/ai/quote-estimate",
+          { material: "teak", basePrice: 85000, quantity: 4 },
+          VENDOR_TOKEN()
+        );
+        expect(res.status).toBe(200);
+        expect(res.body.source).toBe("api-fallback");
+        expect(res.body.estimatedTotal).toBe(425000);
+      } finally {
+        // Restored so the tests after this one still reach the stub.
+        process.env.AI_SERVICE_URL = reachable;
+      }
+    });
+
+    it("keeps the factor breakdown the AI service omits, so the UI shape is identical", async () => {
+      const res = await post(
+        "/api/ai/quote-estimate",
+        { material: "teak", basePrice: 85000, quantity: 4, customSize: true },
+        VENDOR_TOKEN()
+      );
+      expect(res.body.materialFactor).toBe(1.25);
+      expect(res.body.customSizeFactor).toBe(1.2);
+    });
+
+    it("forwards the service key the AI service requires", async () => {
+      receivedKey = undefined;
+      await post("/api/ai/quote-estimate", { material: "teak", basePrice: 85000, quantity: 1 }, VENDOR_TOKEN());
+      expect(receivedKey).toBe(SERVICE_KEY);
+    });
+
+    it("answers from the local formula when the AI service returns a non-numeric total", async () => {
+      returnJunk = true;
+      try {
+        const res = await post(
+          "/api/ai/quote-estimate",
+          { material: "teak", basePrice: 85000, quantity: 4 },
+          VENDOR_TOKEN()
+        );
+        expect(res.status).toBe(200);
+        expect(res.body.source).toBe("api-fallback");
+        expect(res.body.estimatedTotal).toBe(425000);
+      } finally {
+        returnJunk = false;
+      }
     });
   });
 });
